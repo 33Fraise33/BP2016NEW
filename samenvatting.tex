@@ -17,25 +17,19 @@
 %%
 %% LET OP! Een samenvatting is GEEN voorwoord!
 
-%%---------- Nederlandse samenvatting -----------------------------------------
-%%
-%% TODO: Als je je bachelorproef in het Engels schrijft, moet je eerst een
-%% Nederlandse samenvatting invoegen. Haal daarvoor onderstaande code uit
-%% commentaar.
-%% Wie zijn bachelorproef in het Nederlands schrijft, kan dit negeren en heel
-%% deze sectie verwijderen.
-
-\IfLanguageName{english}{%
-\selectlanguage{dutch}
-\chapter*{Samenvatting}
-\lipsum[1-4]
-\selectlanguage{english}
-}{}
-
 %%---------- Samenvatting -----------------------------------------------------
 %%
 %% De samenvatting in de hoofdtaal van het document
 
 \chapter*{\IfLanguageName{dutch}{Samenvatting}{Abstract}}
 
-\lipsum[1-4]
+Internet is tegenwoordig niet meer weg te denken maar om het op te zetten is er vaak toch heel wat werk voor nodig voor een netwerkbeheerder. Zeker bij grotere bedrijven kan het configureren een tijdrovende taak zijn die vaak heel repetitief en gelijkaardig is. De laatste jaren is er veel vooruitgang geboekt bij het automatiseren van servers met behulp van verschillende frameworks en tools. Het volgende onderdeel die aan de beurt is zijn verschillende componenten uit het netwerksegment zoals switches, routers en wifi-controllers. 
+\\
+
+Meer specifiek zal er geconcentreerd worden op het automatiseren met de Ansible architectuur. Deze is uitgebreid in de les gezien bij Meneer Van Vreckem en ook in het werkveld kom je dit al maar vaker tegen. Het zou dus interessant zijn om netwerkapparatuur automatisch te kunnen configureren met dezelfde kennis die de systeembeheerders al hebben. 
+\\
+
+In het document wordt er even onderzoek gedaan naar bestaande automatisatie methoden en waarom er voor Ansible gekozen is. Daarna zal er een basis configuratie gemaakt worden met Cisco apparatuur bestaande uit 1 router en 2 switches. Deze wordt getest en de criteria die moeten voldoen worden genoteerd. Hierna wordt een "Playbook" gemaakt in Ansible en wordt deze toegepast op de apparatuur. Deze zal aan de hand van vooropgestelde resultaten vergeleken worden met de nieuwe resultaten behaald met Ansible. 
+
+%% TODO: BESCHRIJVEND VAN RESULTATEN
+  
