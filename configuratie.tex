@@ -5,11 +5,12 @@
 \chapter{Configuratie zonder automatisatie}
 \label{ch:configuratie}
 
+Voor de testen zal er gebruik gemaakt worden van een Cisco IOS switch geproduceert in 2006. Deze is een 2960 Series switch en meer bepaald de C2960-24LT. Deze heeft 8 poorten met POE en 2 Gigabit interfaces. Bij de configuratie van de switch zijn er drie grote lijnen die we kunnen zien: eerst en vooral het instellen van de basisinstellingen. Dit bestaat uit het configureren van een wachtwoord, hostname en het instellen van standaardwaarden zoals een 'no ip domain-lookup'.
+Daarna wordt er een configuratie aangemaakt met enkele vlans. Deze krijgen een ip adres en een beschrijving. Als laatste onderdeel hebben we dan nog het instellen van een VTP (VLAN Trunk Protocol) server op het apparaat. Dit allemaal samen zou al goed moeten aantonen in hoeverre het mogelijk is om deze zaken te automatiseren.
 
-Bijlage: Switch Commands.md
-
-Voor de testen zal er gebruik gemaakt worden van een Cisco IOS switch geproduceert in 2006. Deze is een 2960 Series switch en meer bepaald de C2960-24LT. Deze heeft 8 poorten met POE en 2 Gigabit interfaces. 
-
+\section{Voorbeeld configuratie}
+\label{sec:voorbeeld}
+Voor de configuratie van de Switch is er het voorbeeld gevolgd van een oefening uit de CCNA cursus. 
 Deze zal geconfigureerd worden op basis van een een oefening uit de CCNA cursus.
 
 Bijlage: cisco excercise example.pdf\\

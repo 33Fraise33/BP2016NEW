@@ -19,10 +19,10 @@ vtp mode server
 vtp domain Lab5
 vtp password cisco
 exit
-int fa0/1
+int range fa0/1-5
 switchport mode trunk
 switchport trunk native vlan 99
-no shut
+no shutdown
 exit
 vlan 99
 name management
@@ -36,36 +36,27 @@ exit
 int vlan99
 ip address 172.17.99.11 255.255.255.0
 exit
+int range fa0/6-10
+switchport access vlan 30
+int range fa0/11-17
+switchport access vlan 10
+int range fa0/18-24
+switchport access vlan 20
 spanning-tree vlan 99 priority 4096
 exit
+copy running-config startup-config
 
-# Switch 2
+# Optional Switch 2
 
-interface fa0/6
-switchport mode access
-no shutdown
-interface fa0/11
-switchport mode access
-no shutdown
-interface fa0/18
-switchport mode access
-no shutdown
-end
 vtp mode client
 vtp domain Lab5
 vtp password cisco
 end
-int fa0/1
+int range fa0/1-5
 switchport mode trunk
 switchport trunk native vlan 99
 no shut
 int vlan99
 ip address 172.17.99.12 255.255.255.0
-int fa0/6
-switchport access vlan 30
-int fa0/11
-switchport access vlan 10
-int fa0/18
-switchport access vlan 20
 end
 copy running-config startup-config
