@@ -1,4 +1,4 @@
-all switches
+# all switches
 
 en
 conf t
@@ -13,7 +13,7 @@ login
 end
 copy running-config startup-config
 
-Switch 1
+# Switch 1
 conf t
 vtp mode server
 vtp domain Lab5
@@ -39,7 +39,7 @@ exit
 spanning-tree vlan 99 priority 4096
 exit
 
-Switch 2
+# Switch 2
 
 interface fa0/6
 switchport mode access

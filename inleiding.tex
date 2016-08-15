@@ -4,35 +4,105 @@
 
 \chapter{Inleiding}
 \label{ch:inleiding}
-Het configureren van netwerkapparatuur kan dus heel wat tijd in beslag nemen. Hoewel er vaak bij nieuwere apparatuur nieuwere apparatuur mogelijkheden zijn om configuratie te automatiseren (INSERT BRON HIER) is het toch vaak vervelend dat er geen eenduidige manier is om dit te doen. Hiervoor zijn er sinds de laatste tijd enkele mogelijkheden voor opgedoken.
+Het configureren van netwerkapparatuur kan dus heel wat tijd in beslag nemen. Hoewel er vaak bij nieuwere apparatuur mogelijkheden zijn om configuratie te automatiseren, zoals bijvoorbeeld met Cisco's eigen NX-OS die draait op zijn Nexus apparatuur, is het toch vaak vervelend dat er geen eenduidige manier is om dit te doen. \autocite{ciscoNxosPDF} Ieder merk heeft een eigen implementatie. Hiervoor zijn er sinds de laatste tijd enkele mogelijkheden voor opgedoken. Waar er dus meer onderzoek naar gedaan zal worden.
 \\
 
-Vorig jaar heeft Dries Vandooren onderzoek gedaan naar automatisering voor netwerkapparatuur met ansible. In de tussentijd is er al heel wat extra vooruitgang geboekt (INSERT BRON HIER) en is het dan ook interessant om te kijken in hoeverre dit gebruikt kan worden voor in productie.
+Vorig jaar heeft Dries Vandooren een gelijkaardig onderzoek uitgevoerd naar automatisering voor netwerkapparatuur met Ansible. In de tussentijd is er al heel wat extra vooruitgang geboekt en is het dan ook interessant om te kijken in hoeverre dit gebruikt kan worden voor in productie.
 
-Er zijn momenteel 2 nieuwe platformen die interessant lijken om te onderzoeken vergeleken met vorig jaar. Dit zijnde: 
+Er zijn drie platformen die interessant lijken te onderzoeken. De eerste twee zijn  nieuw in vergelijking met de bachelorproef die vorig jaar is afgeleverd, de andere dient als referentie. De platformen zijn: 
 \begin{itemize}
-\item Anible's officiële release van Network Tools
+\item Anible's officiële release van Network Tools (beschikbaar vanaf Ansible 2.0)
 \item Napalm: Network Automation and Programmability Abstraction Layer with Multivendor support.
+\item Networklore's implementatie van Ansible voor Cisco IOS apparaten via het SNMP protocol.
 \\
 \end{itemize}
 
-De inleiding moet de lezer alle nodige informatie verschaffen om het onderwerp te begrijpen zonder nog externe werken te moeten raadplegen \autocite{Pollefliet2011}. Dit is een doorlopende tekst die gebaseerd is op al wat je over het onderwerp gelezen hebt (literatuuronderzoek).
+%De inleiding moet de lezer alle nodige informatie verschaffen om het onderwerp te begrijpen zonder nog externe werken te moeten raadplegen \autocite{Pollefliet2011}. Dit is een doorlopende tekst die gebaseerd is op al wat je over het onderwerp gelezen hebt (literatuuronderzoek).
 
-Je verwijst bij elke bewering die je doet, vakterm die je introduceert, enz. naar je bronnen. In \LaTeX{} kan dat met het commando \texttt{$\backslash${textcite\{\}}} of \texttt{$\backslash${autocite\{\}}}. Als argument van het commando geef je de ``sleutel'' van een ``record'' in een bibliografische databank in het Bib\TeX{}-formaat (een tekstbestand). Als je expliciet naar de auteur verwijst in de zin, gebruik je \texttt{$\backslash${}textcite\{\}}.
-Soms wil je de auteur niet expliciet vernoemen, dan gebruik je \texttt{$\backslash${}autocite\{\}}. Hieronder een voorbeeld van elk.
+%Je verwijst bij elke bewering die je doet, vakterm die je introduceert, enz. naar je bronnen. In \LaTeX{} kan dat met het commando \texttt{$\backslash${textcite\{\}}} of \texttt{$\backslash${autocite\{\}}}. Als argument van het commando geef je de ``sleutel'' van een ``record'' in een bibliografische databank in het Bib\TeX{}-formaat (een tekstbestand). Als je expliciet naar de auteur verwijst in de zin, gebruik je \texttt{$\backslash${}textcite\{\}}.
+%Soms wil je de auteur niet expliciet vernoemen, dan gebruik je \texttt{$\backslash${}autocite\{\}}. Hieronder een voorbeeld van elk.
 
-\textcite{Knuth1998} schreef een van de standaardwerken over sorteer- en zoekalgoritmen. Experten zijn het erover eens dat cloud computing een interessante opportuniteit vormen, zowel voor gebruikers als voor dienstverleners op vlak van informatietechnologie~\autocite{Creeger2009}.
+%\textcite{Knuth1998} schreef een van de standaardwerken over sorteer- en zoekalgoritmen. Experten zijn het erover eens dat cloud computing een interessante opportuniteit vormen, zowel voor gebruikers als voor dienstverleners op vlak van informatietechnologie~\autocite{Creeger2009}.
 
 \section{Stand van zaken}
 \label{sec:stand-van-zaken}
+Cisco IOS is een NOS (of Network Operating System). Dit is een van de oudste besturingssystemen die nog dagelijks gebruikt wordt op netwerkapparatuur. Het is gekend om heel robuust te zijn en is dus vaak ook als basis gezien voor de iets geavanceerdere netwerkkennis. IOS staat voor Internetworking Operating Systems en gaat al langer mee dan 1990. Hoewel dit voor informaticastandaarden al een afgeschreven iets zou zijn krijgen apparaten van 2006 nog altijd security updates en is voor een bedrijfsnetwerk dan ook nog uiterst geschikt. \autocite{historyOfCiscoCli} 
+\\
 
+Het enige waarbij deze apparatuur wel duidelijk toont dat deze toch wel wat verouderd begint te worden is dus automatisatie en  provisioning. Bij nieuwere apparatuur worden er vaak ook al verschillende besturingssystemen meegeleverd die vaak heel wat meer automatisatie ingebouwd hebben. Een voorbeeld hiervaan is het laatste nieuwe besturingssysteem van Cisco genaamd NX-OS die op de productlijn met naam 'Nexus' draait. Deze wordt door hen beschreven als 'Open, Progammable,  Agile'. Dit lost natuurlijk nog altijd het probleem niet op dat we hebben met onze oudere maar wel nog functionele apparatuur. \autocite{ciscoNxos}
+\\
+
+De huidige uitvoering voor het configureren bestaat vaak uit twee methodes. De eerste is het handmatig uitvoeren van ieder commando. De tweede is een copy te nemen van de running config of startup config en deze te plakken in het terminal venster van een gelijk apparaat. Dit kan je ook doen door de config op te slaan op een TFTP server en deze dan vaan daaruit laten ophalen door een nog te configureren apparaat.
+
+\subsection{Wat is Ansible}
+\label{sec:whatisansible}
+
+Dit is waar Ansible tevoorschijn komt. Ansible is iets die de laatste jaren een heel snelle opmars aan het maken is. Maar wat is het nu precies? Ansible is een project die het automatiseren van servers over ssh mogelijk maakt. Dit klinkt niet heel spectaculair maar dat is ook niet het enige onderdeel ervan. Ansible maakt het mogelijk om op een heel gestructureerde manier te bepalen wat op een server gedaan wordt, geïnstalleerd wordt, naar gekopieerd wordt etc. Ook wordt alles in een heel leesbare vorm opgeslagen waardoor het voor mensen die geen kennis van Ansible hebben het toch eenvoudig is om het te verstaan wat er allemaal gebeurt. 
+\\
+
+Ansible is dus nog iets vrij recent, het is iets dat sinds 2012 in ontwikkeling is, startende bij een Red Hat Emerging Technologies groep in 2006. Hier werkten werknemers vrij aan wat zelf interessant leek voor de klant. Hieruit kwam 'Cobbler' voort, dit had als doel het beheren van datacenters eenvoudiger te maken.  Dit werd vrij snel groot en kreeg mogelijkheden om bijvoorbeeld DHCP en DNS te beheren in combinatie met dit pakket. Dit werd zo groot dat het gebruikt werd om de grootste DNS netwerken te beheren, heel wat grotere gameservers zoals Modern Warfare van Call of Duty en dan nog kritische zaken zoals financiële onderdelen op Wall Street. 
+\\
+
+Toen kwamen configuratie managementtools zoals Puppet en Chef op de proppen. Deze waren in combinatie met Cobbler een sterke combinatie. Cobbler stelde het basissysteem in en dan werd Puppet gebruikt om de virtuele machines op het apparaat te configureren. Een van de grotere problemen bij deze combinatie was dat er nog problemen waren met deze oplossing. Met Puppet was het bijvoorbeeld niet mogelijk om een server te herstarten.
+\\
+
+Om dit probleem op te lossen werd Func in het leven geroepen. Het concept was vrij eenvoudig: een centrale server die andere servers aanspreekt om bepaalde taken uit te voeren. Dit is vrij gelijkaardig aan een 'Master/slave' configuratie waarbij de 'slaves' luisteren naar de 'master'. Hoewel het niet een heel groot succes werd is het toch gebruikt geweest door Tumblr en zijn er 2 spin-offs uit voortgekomen die elk ook hun onvolledigheid had.
+\\
+
+Deze periode voor de opkomst en grotere populariteit van de term 'DevOps'. Hierbij werden heel vaak Cobbler, Puppet en Func geassocieerd. Daarna werd de betekenis uitgebreid naar de algemene cultuur rond het automatiseren van infrastructuur. 
+Zelf is de oprichter van Ansible nog een lange tijd na deze periode een Puppet voorstander geweest maar het bleek al snel dat er een eenvoudigere taal nodig was om een groter publiek te kunnen bereiken. 
+\\
+
+Door alles samen te zetten kwam de nood voor Ansible. Zoals de bedenker het zelf zegt ' it was mostly to build the tool that you could not use for six months, come back to, and still remember.' \textcite{historyAnsible}. Dus rond februari 2012 werd de fundatie gelegd voor het volledige project, omdat de ontwikkelaar al heel wat kennissen had binnen de DevOps wereld sloeg het vrij snel aan. Samen me de community wordt alles onderhouden en aangevuld. \autocite{historyAnsible}
+\\
+
+Nu een viertal jaar later is Ansible uitgegroeid tot een vaste waarde voor het automatiseren van infrastructuur. In de tussentijd is er nog de toevoeging van onder andere Ansible Tower (de betaalde versie van Ansible voor grotere bedrijven). Dit biedt de mogelijkheid om een overzicht te houden van je hele serverinfrastructuur en maakt het bijhouden van Ansible playbooks eenvoudig en overzichtelijk. 
+\\
+
+Dan sinds kort de laatste belangrijke toevoeging, vooral ook voor dit onderzoek. De toevoeging van de network modules in de Ansible Core vanaf versie 2.0 die januari 2016 gelanceerd is. Deze bevat de mogelijkheid om veel netwerkapparatuur van verschillende merken aan te spreken via een Ansible playbook.
+ \autocite{ansible2}
+ 
+\subsection{Wat is Napalm}
+\label{sec:napalm}
+Napalm staat voor 'Network Automation and Programmability Abstraction Layer with Multivendor support'. In andere woorden iets heel gelijkaardig aan wat Ansible probeert te bereiken met hun network modules. Net als ansible is alles ook open source terug te vinden op een Github pagina waardoor ook hier community kan aan meewerken. Het nadeel aan deze optie is dat deze minder aanhangers zal hebben omdat het iets volledig nieuw op zich is speciaal voor netwerkapparatuur.\autocite{napalmGithub} 
+\\
+
+De eerste commits op Github dateren van begin 2015 waardoor het dus wel al een stuk langer in ontwikkeling is dan de Ansible network modules. Deze wordt nog altijd actief gesupport waardoor het wel een goede oplossing kan zijn voor een huidig netwerk te automatiseren. Support voor verschillende apparaten is goed en heel uitgebreid gedocumenteerd met welk netwerk besturingssysteem wat precies mogelijk is. Hieruit is vrij snel duidelijk dat IOS het grootste deel van de mogelijkheden ondersteund.\autocite{napalmSupport}
+
+\subsection{Overige mogelijkheden}
+\label{sec:overige}
+Als laatste bestaan er nog enkele kleinere opties om het opzetten van een netwerk met Cisco IOS apparatuur te vereenvoudigen. 
+\\
+
+Een van de oudere methodes om het opzetten van een switch eenvoudiger te maken is het kopiëren van de huidige configuratie van een netwerk apparaat naar een gelijke die gelijkaardig geconfigureerd moet zijn. Op die manier moet je toch al heel wat minder werk doen. Het nadeel hiermee is dat je welk nog elk apparaat afzonderlijk moet configureren al is het dan wel niet de gehele configuratie. Het voordeel van deze methode (tegenover het gewoon handmatig configureren) kan zijn dat als je bijvoorbeeld 10 switches hebt die elk dezelfde configuratie moeten hebben. Het enige verschil zal dan de ip adressering zijn wat dan uiteindelijk een kleinere wijziging is. Het nadeel is dat dit nog vrij handmatig is waardoor een foutje er sneller door sluipt.
+\\
+
+Een laatste die nog vermeld zal worden is de 'ansible-cisco-snmp' module van Networklore. Deze is vorig jaar uitgebreid besproken geweest in het onderzoek van Dries Vandooren en wordt daarom deze keer ook nog vermeld om het verschil met de stand van zaken van vandaag te kunnen vergelijken met een jaar geleden. Wat wel op te merken valt aan de module is dat ongeveer sinds de network modules van Ansible zelf uitgekomen zijn er geen commits meer toegevoegd zijn aan de repository op Github.\autocite{networkloreSnmpAnsible}
 %% TODO: deze sectie (die je kan opsplitsen in verschillende secties) bevat je
 %% literatuurstudie. Vergeet niet telkens je bronnen te vermelden!
 
-\lipsum[7-20]
 
 \section{Probleemstelling en Onderzoeksvragen}
 \label{sec:onderzoeksvragen}
+Tegenwoordig wordt nog heel veel netwerkbeheer gedaan aan de hand van manueel wijzigingen doorvoeren en configuraties uitschrijven. Dit kan heel tijdrovend zijn en zorgt dus voor veel overhead. Tijd is iets die veel IT'ers te kort komen en door het huidig werk te automatiseren zou er dus weer meer tijd vrijkomen voor andere taken.
+\\
+
+Een voorbeeld uit het echte leven zou het volgende kunnen zijn.
+In België heb je een van de grootste Lanparties genaamd 'Frag-O-Matic'. Deze hebben jaarlijks 2 edities waar ongeveer een 1000 tal gamers op afkomen, het opzetten van dergelijke structuur is dan ook een heel werk. In het netwerkteam alleen al zitten een 15 tal enthousiastelingen die naast hun vaak full time job of school nog heel wat avonden tijd vrij maken om het netwerk voor de volgende editie op punt te stellen. Alles wordt uitgetekend, uitgewerkt en uiteindelijk getest. Zelf al hebben zij hun grootste deel van de configuratie op voorhand klaar zou het handiger zijn moest er een automatisch manier zijn om alles in 1 keer te provisionen en zo het werk van dit team te verlichten. 
+\\
+
+Op die manier zou het per editie in plaats van alles opnieuw te kopiëren zijn eerder de play books eens doorlopen en aanvallen waar nodig. Een testopstelling kan dan ook op een korte tijd opgezet worden om de werking van bepaalde onderdelen van het netwerk te testen.
+\\
+
+Mijn onderzoeksvragen sluiten dan ook vooral aan op de mogelijkheid van het gebruik van Ansible voor het automatiseren.
+\begin{itemize}
+\item Is het mogelijk om met Ansible een netwerk te provisionen op Cisco IOS apparatuur.
+\item In hoeverre is de implementatie volwassen om dit voor het dagelijks leven te gebruiken en dit te laten integreren bij bedrijven.
+\item Zijn er dingen die niet mogelijk zijn met Ansible.
+\item Wat is de minimumvereiste voor de apparatuur om aan de slag te kunnen gaan en playbooks te pushen vanaf Ansible.
+\\
+\end{itemize}
+
 
 %% TODO:
 %% Uit je probleemstelling moet duidelijk zijn dat je onderzoek een meerwaarde
@@ -54,6 +124,7 @@ De rest van deze bachelorproef is als volgt opgebouwd:
 In Hoofdstuk~\ref{ch:methodologie} wordt de methodologie toegelicht en worden de gebruikte onderzoekstechnieken besproken om een antwoord te kunnen formuleren op de onderzoeksvragen.
 
 %% TODO: Vul hier aan voor je eigen hoofstukken, één of twee zinnen per hoofdstuk
+In Hoofdstuk~\ref{ch:configuratie} wordt de basisinstelling van het Cisco apparaat vastgelegd en wat het te bereiken resultaat moet zijn. 
 
 In Hoofdstuk~\ref{ch:conclusie}, tenslotte, wordt de conclusie gegeven en een antwoord geformuleerd op de onderzoeksvragen. Daarbij wordt ook een aanzet gegeven voor toekomstig onderzoek binnen dit domein.
 

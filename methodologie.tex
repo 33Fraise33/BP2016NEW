@@ -5,11 +5,39 @@
 \chapter{Methodologie}
 \label{ch:methodologie}
 
+\section{Onderzoek naar mogelijkheden}
+\label{ch:mogelijkheden}
+
+Eerst en vooral werd er gezocht naar wat de mogelijkheden zijn de dag van vandaag in vergelijking met een jaar geleden. Omdat dit vooral rond Ansible draait is er dus eerst naar dat onderdeel gekeken. Het is belangrijk dat het onderzoek toekomstgericht is en dus ook met de laatste mogelijkheden werkt. Omdat er heel veel vooruitgang geboekt wordt binnen deze sector is het dus cruciaal dat dit documentatie gebruikt die zo up-to-date mogelijk is. 
+\\
+
+Hiervoor werd er gezocht op verschillende fora, er werd gekeken naar de blogposts van Ansible zelf en heel vaak wordt er ook gekeken op Github repositories. Deze zijn vaak een heel goede indicatie van in hoeverre een project nog actief ondersteund wordt en deze nog verder ontwikkeld wordt. Iets die meer dan een jaar geen commit meer heeft ontvangen kan je zo goed als niet nuttig beschouwen in vergelijking met de projecten die de laatste jaar op gang zijn gekomen. 
+\\
+
+Heel vaak werd er ook door documentatie gegaan om te kijken wat mogelijk was met welke tools om te zien of dit voldoet aan wat we willen bereiken. Goede documentatie is ook een belangrijke factor om het project goed te kunnen gebruiken in het verdere proces. Ook maakt dit ook heel veel uit om de keuze voor een bepaald pakket eenvoudiger te maken. 
+
+\section{Uitwerking basis configuratie}
+\label{ch:configuratie}
+
+Om het configureren op de test te stellen moet er eerst een basis configuratie voor handen zijn. Dit is hoe het eindresultaat zou moeten zijn na het uitvoeren van gelijk welke automatisatie methode. Als dit niet zo is dan kunnen we beslissen dat het gebruik van een bepaalde techniek niet geschikt is voor dagelijks gebruik of implementatie in een bedrijfsinfrastructuur.
+\\
+
+De basisconfiguratie zal zich richten op Cisco IOS apparatuur meer bepaald wat voor handen is. Hoofdzakelijk zal er gewerkt worden met een 2960 series switch die voor dit onderzoek ten allen tijde beschikbaar was. De configuratie zal vooral inwerken op enkel basiscommando's die in het dagelijks leven het meest gebruikt worden. Hieronder valt bijvoorbeeld VLAN tagging en bijvoorbeeld ip adressering. 
+
+\section{Automatiseren van configuratie}
+\label{ch:automatiseren}
+
+Als laatste hebben we dan nog het belangrijkste aspect van dit onderzoek, dit zijnde het automatiseren van de configuratie die bereikt is met de bovenstaande methode. Er zal gestart worden van een bepaalde basisconfiguratie, dit het liefst zo dicht mogelijk bij een factory reset. Dus er wordt ook gekeken naar hoeveel werk er op voorhand nodig is om alles werkende te kunnen krijgen via een automatisch platform zoals Ansible. Ook moet er rekening gehouden worden met de configuratie in combinatie met Ansible. Hoeverre kan het automatiseren voor problemen zorgen bijvoorbeeld als Ansible een ip adres verandert en zichzelf zo buitensluit bijvoorbeeld. Dit probleem heeft dan ook te maken met dat Ansible voor netwerkapparatuur over SSH loopt die een geldige ip adressering nodig heeft om te kunnen werken.
+\\
+
+Net zoals het configureren van een server zal er ook eerst gekeken worden naar de stappen die manueel nodig zijn om het resultaat te behalen. Daarna zullen deze stappen overgezet worden in 'Tasks' zoals dit binnen Ansible noemt. Het voordeel vergeleken met een server role is dat de stappen bij een switch en router veel eenduidiger zullen zijn. Het installeren van een DNS server op Linux is net iets ingewikkelder dan de commando's laten uitvoeren binnen Ansible die nodig zijn om een Cisco apparaat te configureren.
+
+
+
 %% TODO: Hoe ben je te werk gegaan? Verdeel je onderzoek in grote fasen, en
 %% licht in elke fase toe welke stappen je gevolgd hebt. Verantwoord waarom je
 %% op deze manier te werk gegaan bent. Je moet kunnen aantonen dat je de best
 %% mogelijke manier toegepast hebt om een antwoord te vinden op de
 %% onderzoeksvraag.
 
-\lipsum[21-25]
 
