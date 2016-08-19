@@ -5,12 +5,8 @@ conf t
 ip default-gateway 172.17.1.1
 int vlan1
 ip address 172.17.1.2 255.255.255.0
-no ip address 10.0.0.1 255.255.255.0 secondary
+no shut
 exit
-
-
-conf t
-hostname switch1
 ip domain-name website.be
 crypto key generate rsa
 2048
@@ -26,14 +22,18 @@ login local
 password cisco
 exit
 service password-encryption
-
-
+end
 copy running-config startup-config
+
+reload
+
+.
 
 # Switch 1
 en
 class
 conf t
+hostname switch1
 vtp mode server
 vtp domain Lab5
 vtp password cisco
@@ -58,13 +58,17 @@ int range fa0/6-10
 switchport access vlan 30
 int range fa0/11-17
 switchport access vlan 10
-int range fa0/18-24
+int range fa0/18-23
 switchport access vlan 20
 exit
 spanning-tree vlan 99 priority 4096
-exit
+end
 
 copy running-config startup-config
+
+reload
+
+.
 
 # Optional Switch 2
 
