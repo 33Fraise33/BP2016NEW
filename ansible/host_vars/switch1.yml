@@ -1,7 +1,7 @@
 ---
 cli:
-  host: "{{ inventory_hostname }}"
-  username: "{{ ios_cli_user | default('cisco') }}"
-  password: "{{ ios_cli_pass | default('cisco') }}"
+  host: 172.17.1.2
+  username: "switchadmin"
+  password: "cisco"
   transport: cli
 

@@ -1,0 +1,2 @@
+[switches]
+switch1 ansible_host=172.17.1.2

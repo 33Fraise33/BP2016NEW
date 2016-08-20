@@ -1,13 +1,10 @@
 ---
-- hosts: ios
+- hosts: switches
   gather_facts: no
   connection: local
 
-  vars: 
+  vars:
     limit_to: "*"
-
-  roles: 
+    
+  roles:
     - common
-    - vtpserver
-    - stp
-    - vlan
