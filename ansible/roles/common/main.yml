@@ -1,4 +1,0 @@
-- name: test configuration
-  ios_command:
-    commands: show version
-    provider: "{{ cli }}"

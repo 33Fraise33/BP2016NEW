@@ -1,0 +1,8 @@
+- name: test configuration
+  ios_command:
+    commands: 
+      - conf t
+      - hostname derphost
+    authorize: yes
+    auth_pass: "class"
+    provider: "{{ cli }}"
