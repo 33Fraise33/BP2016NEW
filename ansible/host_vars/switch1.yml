@@ -1,9 +1,5 @@
 ---
-cli:
-  host: 172.17.1.2
-  username: "switchadmin"
-  password: "cisco"
-  transport: cli
+management_ip: 172.17.1.2
 
 vlan99_ip: "172.17.99.11 255.255.255.0"
 

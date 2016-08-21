@@ -1,4 +1,4 @@
-# all switches
+# all switches (except for a unique ip address)
 
 en
 conf t
@@ -23,8 +23,7 @@ password cisco
 exit
 service password-encryption
 end
-copy running-config startup-config
-
+write memory
 reload
 
 .
@@ -63,9 +62,7 @@ switchport access vlan 20
 exit
 spanning-tree vlan 99 priority 4096
 end
-
-copy running-config startup-config
-
+write memory
 reload
 
 .
@@ -83,4 +80,4 @@ no shut
 int vlan99
 ip address 172.17.99.12 255.255.255.0
 end
-copy running-config startup-config
+write memory

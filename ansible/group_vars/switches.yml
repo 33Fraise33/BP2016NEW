@@ -1,0 +1,6 @@
+---
+cli:
+  host: "{{ management_ip }}"
+  username: "switchadmin"
+  password: "cisco"
+  transport: cli

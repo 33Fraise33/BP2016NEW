@@ -6,3 +6,7 @@ switch1
 
 [client-switches]
 switch2
+
+[switches:children]
+server-switches
+client-switches
