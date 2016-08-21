@@ -1,0 +1,120 @@
+%%=============================================================================
+%% Configuratie
+%%=============================================================================
+
+\chapter{Automatisatie in combinatie met Ansible}
+\label{ch:ansible}
+Waar het nu wel allemaal om draait is natuurlijk het automatiseren van alles binnen de Ansible structuur. Er werd een playbook opgemaakt met de basisstructuur en daar werd geleidelijk aan de benodigde configuratie aan toegevoegd.
+
+\section{Configuratie Ansible}
+\label{ch:ansibleconfiguratie}
+Voor het gebruik van Ansible in combinatie met de 'network-modules' heb je de laatste release nodig van Ansible. Bij het schrijven is dit 2.1.1.0. Deze heeft enkele bug fixes voor netwerk apparatuur. De minimale vereiste voor de ondersteuning van  de netwerkapparatuur is versie 2.1.0.0, dit was de officiële release van de netwerk modules in de core modules. \autocite{ansiblechangelog}
+\\
+
+Verder is er een moeilijke keuze geweest qua besturingssysteem om de Ansible rol op uit te voeren. Er werd eerst gekozen om gebruik te maken van een MacBook met de laatste versie 'El Capitan'. Na heel wat zoeken en na het testen van de development release vanaf source bleef er een probleem aanhouden met de 'paramiko' package die nodig is om te kunnen communiceren met netwerkapparaten. Daarna werd er gebruik gemaakt van een laptop waar Ubuntu 16.04 LTS op staat. Ook hier werd de laatste release en development versie op getest. Alles leek te werken maar er bleek een probleem met de ios\_config module. Dus om het toch nog even te testen werd er naar Windows opgestart en werd er gebruik gemaakt van het nieuwe 'Bash on Ubuntu on Windows'. Ook hier werd de laatste release versie getest en de laatste versie die in ontwikkeling is. Ook hier kwam het probleem terug met de ios\_config module.
+\\
+
+Verdere configuratie verliep dan verder via de nieuwe implementatie 'Bash on Ubuntu on Windows' (die beschikbaar is geworden met de Windows 10 Anniversary Update) wat verassend genoeg volledig werkte op ieder ander vlak. Hou er wel rekening mee dat deze moet opgestart worden als administrator omdat anders bepaalde netwerkmogelijkheden niet beschikbaar zijn voor bash. Het is een goeie vooruitgang om ook apparaten te kunnen configureren met Ansible vanaf een Windows apparaat. Dit staat natuurlijk los van het onderzoek maar is wel interessant om even op te merken daar het verder onderzoek vanaf een Windows apparaat verliep. 
+\\
+
+Verder zal er niet ingegaan worden op vlak van installatie van Ansible. Er wordt verwacht dat de basis van Ansible beschikbaar is op het controlerend apparaat.
+
+\section{Ansible Playbook}
+\label{ch:ansibleplaybook}
+Bij het schrijven van de playbook voor Ansible werd er zoveel mogelijk gebruik gemaakt van de verschillende mogelijkheden om te tonen wat er momenteel ongeveer al allemaal mogelijk is bij het configureren van netwerksystemen. Verder werden de rollen voor verschillende apparaten opgedeeld in een logische structuur per functie. 
+\\
+
+De werkelijke uitvoering van de playbook is er maar gebruik gemaakt van een apparaat namelijk 'switch1'. Er is wel nog ruimte voorzien om dit gemakkelijk uit te breiden naar een tweede apparaat. De configuratie hiervan is wel aangemaakt maar staat in commentaar. De volledige opstelling kan je vinden onderaan in de bijlagen. Verder werd er hier geen gebruik gemaakt van de module ios\_config omdat deze in de huidige staat voor problemen zorgt. Dit is wel de aan te raden manier om configuratie wijzigingen te doen omdat deze zal kijken wat er in de huidige configuratie staat. De ios\_command module die in deze playbook is gebruikt is dus niet de ideale manier maar kan wel werken met variabelen en templating wat je niet hebt bij het gewoon aanmaken van een configuratie.
+\\
+
+Om een idee te geven van hoe de ios\_config module precies werkt is er wel een 'common-config' rol toegevoegd die hetzelfde doet als de 'common-command' rol. Dit om aan te tonen hoe het wel correct zou kunnen zijn.
+
+\subsection{Belangrijke Playbook Onderdelen}
+\label{ch:ansibleplaybookonderdelen}
+Vervolgens zal er wat dieper ingegaan worden op enkele specifieke onderdelen uit de playbook die kenmerkend zijn voor de network-modules.
+\\
+
+Een van de belangrijkste onderdelen zijn de login gegevens voor toegang te krijgen tot de switch. Je kan deze afzonderlijk meegeven bij iedere task maar het is eenvoudiger om deze als een host of group variable mee te geven. Dit is mogelijk door de parameter 'provider' die beschikbaar is bij iedere ios module. Deze ondersteund de parameters die onder de module terecht horen in een object, speciaal voor het eenvoudig maken van templating. Verder moet ook de transport parameter meegegeven worden om de correcte connectie te kunnen maken, dit is 'cli' voor deze apparaten.
+\\
+
+Verder is er gebruik gemaakt van hashes als variabelen. Dit maakt het heel eenvoudig om commando's die heel hard op elkaar lijken te herhalen. Dit kan bijvoorbeeld het instellen van interfaces zijn of zoals hier bijvoorbeeld het toevoegen van vlans.
+
+\begin{verbatim}
+# roles/vlan/tasks/main.yaml
+- name: set vlans
+  ios_command:
+    commands:
+      - conf t
+      - vlan {{ item.key }}
+      - name {{ item.value.name }}
+    provider: "{{ cli }}"
+  with_dict: "{{ vlans }}"
+  
+# host_vars/switch1.yaml
+vlans:
+  99:
+    name: management
+  10:
+    name: faculty-staff
+  20:
+    name: students
+  30:
+    name: guest
+\end{verbatim}
+
+Verder is er ook nog een inventory file gebruikt met geneste groepen. Als hoofdgroepen hebben we namelijk 'routers' en 'switches'. Maar onder switches zit er een subcategorie 'server-switches' en 'client-switches' die het zo mogelijk maakt om heel eenvoudig verschillende configuraties te sturen naar de verschillende groepen switches. Een client heeft bijvoorbeeld geen vlan rol, in de toekomst zouden hier nog andere verschillen kunnen bijkomen.
+
+\subsection{Uitvoeren Playbook}
+\label{ch:ansibleplaybookexecution}
+
+Na dat de volledige configuratie aangemaakt was werd deze opnieuw uitgevoerd tegen een switch die terug werd gezet naar de minimale configuratie die nodig is om er van op afstand mee te connecteren via SSH. Nadien werd de configuratie naast elkaar geplaatst om te kijken wat het restultaat was. Onderstaande uitvoer van Ansible toont dat de playbook volledig correct werd uitgevoerd.
+
+\begin{verbatim}
+ubuntu@LAPTOP-GIANNI:/mnt/c/Users/Gianni/Documents/GitHub/BP2016NEW/
+    ansible$ ansible-playbook ios.yml -i inventory
+
+PLAY [server-switches] *********************************************************
+
+TASK [common-command : set hostname] *******************************************
+ok: [switch1]
+
+TASK [common-command : disable service 'config'] *******************************
+ok: [switch1]
+
+TASK [vtp : set vlans] *********************************************************
+ok: [switch1]
+
+TASK [trunking : set interfaces 1-5 as trunk ports] ****************************
+ok: [switch1]
+
+TASK [trunking : set ip trunk vlan] ********************************************
+ok: [switch1]
+
+TASK [vlan : set vlans] ********************************************************
+ok: [switch1] => (item={'value': {u'name': u'faculty-staff'}, 'key': 10})
+ok: [switch1] => (item={'value': {u'name': u'management'}, 'key': 99})
+ok: [switch1] => (item={'value': {u'name': u'students'}, 'key': 20})
+ok: [switch1] => (item={'value': {u'name': u'guest'}, 'key': 30})
+
+TASK [vlan : assign interfaces to vlans] ***************************************
+ok: [switch1] => (item={'value': {u'vlan': 30}, 'key': u'6-10'})
+ok: [switch1] => (item={'value': {u'vlan': 10}, 'key': u'11-17'})
+ok: [switch1] => (item={'value': {u'vlan': 20}, 'key': u'18-23'})
+
+TASK [vlan : set spanning-tree] ************************************************
+ok: [switch1]
+
+TASK [saveconfig : save running-config to startup-config] **********************
+ok: [switch1]
+
+PLAY RECAP *********************************************************************
+switch1                    : ok=9    changed=0    unreachable=0    failed=0
+\end{verbatim}
+
+Na het uitvoeren van de Ansible rol bleek dan ook dat de configuratie identiek gelijk was aan elkaar. 
+
+\section{Conclusie}
+\label{ch:ansibleconclusion}
+We kunnen hier uit besluiten dat Ansible op zich correct werkt met netwerkapparatuur. Het biedt extra mogelijkheid tot over het gewoon configureren wat het een heel stuk overzichtelijker maakt en eenvoudiger om een groot netwerkpark te beheren. Het nadeel is wel dat de module ios\_config nog niet werkt. Deze heeft duidelijker weer wat de precieze wijzigingen zijn die toegepast zijn op de configuratie. Eenmaal deze module volledig werkende is lijkt dit een goede optie om het configureren van Cisco IOS apparatuur te automatiseren.
+
+Voor dit aan te kaarten is als de optimale manier van automatisatie voor Cisco apparatuur zal de tegenhanger NAPALM op de test gezet worden.
