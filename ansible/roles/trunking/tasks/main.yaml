@@ -6,8 +6,6 @@
       - switchport mode trunk
       - switchport trunk native vlan 99
       - no shutdown
-    authorize: yes
-    auth_pass: "class"
     provider: "{{ cli }}"
 
 - name: set ip trunk vlan
@@ -16,6 +14,4 @@
       - conf t
       - int vlan99
       - ip address {{ vlan99_ip }}
-    authorize: yes
-    auth_pass: "class"
     provider: "{{ cli }}"

@@ -4,8 +4,6 @@
       - conf t
       - vlan {{ item.key }}
       - name {{ item.value.name }}
-    authorize: yes
-    auth_pass: "class"
     provider: "{{ cli }}"
   with_dict: "{{ vlans }}"
 
@@ -15,8 +13,6 @@
       - conf t
       - int range fa0/{{ item.key }}
       - switchport access vlan {{ item.value.vlan }}
-    authorize: yes
-    auth_pass: "class"
     provider: "{{ cli }}"
   with_dict: "{{ interfaces }}"
 
@@ -25,6 +21,4 @@
     commands:
       - conf t
       - spanning-tree vlan 99 priority 4096
-    authorize: yes
-    auth_pass: "class"
     provider: "{{ cli }}"

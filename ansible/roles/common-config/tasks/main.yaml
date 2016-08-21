@@ -2,15 +2,10 @@
   ios_config:
     lines:
       - ['hostname {{inventory_hostname}}']
-    authorize: yes
-    auth_pass: "class"
     provider: "{{ cli }}"
-
 
 - name: disable service 'config'
   ios_config:
     lines:
       - ['no service config']
-    authorize: yes
-    auth_pass: "class"
     provider: "{{ cli }}"

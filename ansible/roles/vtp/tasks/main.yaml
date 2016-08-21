@@ -5,6 +5,4 @@
       - vtp mode {{ vtp }}
       - vtp domain Lab5
       - vtp password cisco
-    authorize: yes
-    auth_pass: "class"
     provider: "{{ cli }}"

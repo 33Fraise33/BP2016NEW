@@ -3,8 +3,6 @@
     commands:
       - conf t
       - hostname "{{ inventory_hostname }}"
-    authorize: yes
-    auth_pass: "class"
     provider: "{{ cli }}"
 
 
@@ -13,6 +11,4 @@
     commands:
       - conf t
       - no service config
-    authorize: yes
-    auth_pass: "class"
     provider: "{{ cli }}"

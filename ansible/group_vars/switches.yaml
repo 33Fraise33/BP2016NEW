@@ -3,4 +3,6 @@ cli:
   host: "{{ management_ip }}"
   username: "switchadmin"
   password: "cisco"
+  authorize: yes
+  auth_pass: "class"
   transport: cli
