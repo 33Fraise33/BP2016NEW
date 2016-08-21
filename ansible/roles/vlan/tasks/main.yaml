@@ -1,0 +1,21 @@
+- name: set vlans
+  ios_command:
+    commands:
+      - conf t
+      - vlan {{ item.key }}
+      - name {{ item.value.name }}
+    authorize: yes
+    auth_pass: "class"
+    provider: "{{ cli }}"
+  with_dict: "{{ vlans }}"
+
+- name: assign interfaces to vlans
+  ios_command:
+    commands:
+      - conf t
+      - int range fa0/{{ item.key }}
+      - switchport access vlan {{ item.value.vlan }}
+    authorize: yes
+    auth_pass: "class"
+    provider: "{{ cli }}"
+  with_dict: "{{ interfaces }}"

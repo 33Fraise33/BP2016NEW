@@ -1,0 +1,8 @@
+[routers]
+router1
+
+[server-switches]
+switch1
+
+[client-switches]
+switch2

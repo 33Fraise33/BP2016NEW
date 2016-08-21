@@ -1,10 +1,27 @@
 ---
-- hosts: switches
+- hosts: server-switches
   gather_facts: no
   connection: local
 
   vars:
     limit_to: "*"
-    
+
   roles:
-    - common
+    - common-command
+#   - common-config
+    - vtp
+    - trunking
+    - vlan
+
+#- hosts: client-switches
+#  gather_facts: no
+#  connection: local
+#
+#  vars:
+#    limit_to: "*"
+#
+#  roles:
+#    - common-command
+##  - common-config
+#    - vtp
+#    - trunking

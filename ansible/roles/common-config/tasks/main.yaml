@@ -1,18 +1,16 @@
 - name: set hostname
   ios_config:
     lines:
-      - ['hostname foo']
+      - ['hostname {{inventory_hostname}}']
     authorize: yes
     auth_pass: "class"
     provider: "{{ cli }}"
-  register: result
 
 
 - name: disable service 'config'
-  ios_command:
-    commands:
-      - conf t
-      - no service config
+  ios_config:
+    lines:
+      - ['no service config']
     authorize: yes
     auth_pass: "class"
     provider: "{{ cli }}"

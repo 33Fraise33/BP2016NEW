@@ -1,0 +1,21 @@
+- name: set interfaces 1-5 as trunk ports
+  ios_command:
+    commands:
+      - conf t
+      - int range fa0/1-5
+      - switchport mode trunk
+      - switchport trunk native vlan 99
+      - no shutdown
+    authorize: yes
+    auth_pass: "class"
+    provider: "{{ cli }}"
+
+- name: set ip trunk vlan
+  ios_command:
+    commands:
+      - conf t
+      - int vlan99
+      - ip address {{ vlan99_ip }}
+    authorize: yes
+    auth_pass: "class"
+    provider: "{{ cli }}"

@@ -5,3 +5,24 @@ cli:
   password: "cisco"
   transport: cli
 
+vlan99_ip: "172.17.99.11 255.255.255.0"
+
+vlans:
+  99:
+    name: management
+  10:
+    name: faculty-staff
+  20:
+    name: students
+  30:
+    name: guest
+
+interfaces:
+  6-10:
+    vlan: 30
+  11-17:
+    vlan: 10
+  18-23:
+    vlan: 20
+
+vtp: server
