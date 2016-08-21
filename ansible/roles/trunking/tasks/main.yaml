@@ -1,3 +1,4 @@
+# roles/trunking/tasks/main.yaml
 - name: set interfaces 1-5 as trunk ports
   ios_command:
     commands:

@@ -1,3 +1,5 @@
+# roles/common-config/tasks/main.yaml
+
 - name: set hostname
   ios_config:
     lines:

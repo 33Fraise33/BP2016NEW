@@ -1,3 +1,4 @@
+# roles/common-command/tasks/main.yaml
 - name: set hostname
   ios_command:
     commands:
