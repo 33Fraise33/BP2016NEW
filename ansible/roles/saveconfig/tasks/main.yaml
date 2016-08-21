@@ -1,0 +1,7 @@
+- name: save running-config to startup-config
+  ios_command:
+    commands:
+      - write memory
+    authorize: yes
+    auth_pass: "class"
+    provider: "{{ cli }}"

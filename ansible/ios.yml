@@ -12,6 +12,7 @@
     - vtp
     - trunking
     - vlan
+    - saveconfig
 
 #- hosts: client-switches
 #  gather_facts: no
@@ -25,3 +26,4 @@
 ##  - common-config
 #    - vtp
 #    - trunking
+#    - saveconfig

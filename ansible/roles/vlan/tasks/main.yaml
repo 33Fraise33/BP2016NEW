@@ -19,3 +19,12 @@
     auth_pass: "class"
     provider: "{{ cli }}"
   with_dict: "{{ interfaces }}"
+
+- name: set spanning-tree
+  ios_command:
+    commands:
+      - conf t
+      - spanning-tree vlan 99 priority 4096
+    authorize: yes
+    auth_pass: "class"
+    provider: "{{ cli }}"
