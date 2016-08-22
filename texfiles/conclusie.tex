@@ -5,11 +5,20 @@
 \chapter{Conclusie}
 \label{ch:conclusie}
 
-%% TODO: Trek een duidelijke conclusie, in de vorm van een antwoord op de
-%% onderzoeksvra(a)g(en). Wat was jouw bijdrage aan het onderzoeksdomein en
-%% hoe biedt dit meerwaarde aan het vakgebied/doelgroep? Reflecteer kritisch
-%% over het resultaat. Had je deze uitkomst verwacht? Zijn er zaken die nog
-%% niet duidelijk zijn? Heeft het ondezoek geleid tot nieuwe vragen die
-%% uitnodigen tot verder onderzoek?
+Nu we de belangrijkste mogelijkheden hebben gezien is het tijd voor het besluit. De automatisatie van servers is al even een standaard aan het worden in combinatie met Ansible. Maar is Ansible ook capabel genoeg om netwerkapparaten en meer bepaald Cisco IOS apparaten aan te spreken? Kort gezegd, ja. Maar wel met enkele opmerkingen.
+\\
 
+Er is nog nood aan verdere actieve ontwikkeling van het project om het volledig klaar te noemen voor dagelijks gebruik. Toch lijkt het al goed genoeg om dit aan te raden voor mensen met grotere netwerken die zij te beheren hebben. Met de module die tijdens dit project gebruikt is kan je al heel ver raken en heb je ook alle voordelen die Ansible heeft. Dus het gebruiken van variabelen, meerdere apparaten in een playbook aanspreken, enz.
+\\
+
+De tegenhanger NAPALM daarentegen is nog niet volledig genoeg om gebruik te maken in het dagelijks leven, toch zeker niet bij IOS. Hoewel dit niet wil zeggen dat andere opties niet werken kan het toch een teken zijn dat er minder ondersteuning voorzien wordt.
+\\
+
+Om even terug te komen op de onderzoeksvragen. Is het mogelijk om apparaten met het IOS te provisionen via Ansible? Het kan bevestigd worden dat dit werkt en het is dan ook een goeie ontwikkeling dat dit mogelijk is. Is het klaar voor dagelijks gebruik? Dit hangt af van de situatie maar in de meeste gevallen kunnen we dit aanraden. De reden hiervoor is het antwoord op de vraag of Ansible iets nog niet kan. En dit is vooral tonen wat er gewijzigd is en wat niet. Dit zit in het nu niet werkende ios\_config, maar het bestaat wel.
+\\
+
+Als laatste, voor je zelf aan de slag gaat moet je wel rekening houden met de minimum vereisten voor deze onderdelen in gebruik te nemen. Voor Ansible is er nood aan een versie die minimum 2.1.0 is. Op het apparaat die Cisco draait moet SSH ingeschakeld worden samen met een gebruikersnaam en een wachtwoord. 
+\\
+
+Verdere ontwikkelen zullen uitwijzen hoe ver de mogelijkheden zullen gaan met deze frameworks. De vooruitgang die nu al is geboekt, is onweerlegbaar al een hele stap en het is dan ook uitkijken naar welke grote projecten we hier rond zullen zien.
 

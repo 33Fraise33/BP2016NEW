@@ -17,6 +17,12 @@ Verder is er een moeilijke keuze geweest qua besturingssysteem om de Ansible rol
 Verdere configuratie verliep dan verder via de nieuwe implementatie 'Bash on Ubuntu on Windows' (die beschikbaar is geworden met de Windows 10 Anniversary Update) wat verassend genoeg volledig werkte op ieder ander vlak. Hou er wel rekening mee dat deze moet opgestart worden als administrator omdat anders bepaalde netwerkmogelijkheden niet beschikbaar zijn voor bash. Het is een goeie vooruitgang om ook apparaten te kunnen configureren met Ansible vanaf een Windows apparaat. Dit staat natuurlijk los van het onderzoek maar is wel interessant om even op te merken daar het verder onderzoek vanaf een Windows apparaat verliep. 
 \\
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=5cm]{../img/bashonwindows}
+\caption{Bash in Windows of via de correcte term 'Bash on Ubuntu on Windows' }
+\end{figure}
+
 Verder zal er niet ingegaan worden op vlak van installatie van Ansible. Er wordt verwacht dat de basis van Ansible beschikbaar is op het controlerend apparaat.
 
 \section{Ansible Playbook}
@@ -39,7 +45,8 @@ Een van de belangrijkste onderdelen zijn de login gegevens voor toegang te krijg
 
 Verder is er gebruik gemaakt van hashes als variabelen. Dit maakt het heel eenvoudig om commando's die heel hard op elkaar lijken te herhalen. Dit kan bijvoorbeeld het instellen van interfaces zijn of zoals hier bijvoorbeeld het toevoegen van vlans.
 
-\begin{verbatim}
+\begin{center}
+\begin{BVerbatim}
 # roles/vlan/tasks/main.yaml
 - name: set vlans
   ios_command:
@@ -60,7 +67,8 @@ vlans:
     name: students
   30:
     name: guest
-\end{verbatim}
+\end{BVerbatim}
+\end{center}
 
 Verder is er ook nog een inventory file gebruikt met geneste groepen. Als hoofdgroepen hebben we namelijk 'routers' en 'switches'. Maar onder switches zit er een subcategorie 'server-switches' en 'client-switches' die het zo mogelijk maakt om heel eenvoudig verschillende configuraties te sturen naar de verschillende groepen switches. Een client heeft bijvoorbeeld geen vlan rol, in de toekomst zouden hier nog andere verschillen kunnen bijkomen.
 
@@ -69,47 +77,51 @@ Verder is er ook nog een inventory file gebruikt met geneste groepen. Als hoofdg
 
 Na dat de volledige configuratie aangemaakt was werd deze opnieuw uitgevoerd tegen een switch die terug werd gezet naar de minimale configuratie die nodig is om er van op afstand mee te connecteren via SSH. Nadien werd de configuratie naast elkaar geplaatst om te kijken wat het restultaat was. Onderstaande uitvoer van Ansible toont dat de playbook volledig correct werd uitgevoerd.
 
-\begin{verbatim}
+\begin{center}
+\begin{BVerbatim}
+
 ubuntu@LAPTOP-GIANNI:/mnt/c/Users/Gianni/Documents/GitHub/BP2016NEW/
     ansible$ ansible-playbook ios.yml -i inventory
 
-PLAY [server-switches] *********************************************************
+PLAY [server-switches] ****************************************************
 
-TASK [common-command : set hostname] *******************************************
+TASK [common-command : set hostname] **************************************
 ok: [switch1]
 
-TASK [common-command : disable service 'config'] *******************************
+TASK [common-command : disable service 'config'] **************************
 ok: [switch1]
 
-TASK [vtp : set vlans] *********************************************************
+TASK [vtp : set vlans] ****************************************************
 ok: [switch1]
 
-TASK [trunking : set interfaces 1-5 as trunk ports] ****************************
+TASK [trunking : set interfaces 1-5 as trunk ports] ***********************
 ok: [switch1]
 
-TASK [trunking : set ip trunk vlan] ********************************************
+TASK [trunking : set ip trunk vlan] ***************************************
 ok: [switch1]
 
-TASK [vlan : set vlans] ********************************************************
+TASK [vlan : set vlans] ***************************************************
 ok: [switch1] => (item={'value': {u'name': u'faculty-staff'}, 'key': 10})
 ok: [switch1] => (item={'value': {u'name': u'management'}, 'key': 99})
 ok: [switch1] => (item={'value': {u'name': u'students'}, 'key': 20})
 ok: [switch1] => (item={'value': {u'name': u'guest'}, 'key': 30})
 
-TASK [vlan : assign interfaces to vlans] ***************************************
+TASK [vlan : assign interfaces to vlans] **********************************
 ok: [switch1] => (item={'value': {u'vlan': 30}, 'key': u'6-10'})
 ok: [switch1] => (item={'value': {u'vlan': 10}, 'key': u'11-17'})
 ok: [switch1] => (item={'value': {u'vlan': 20}, 'key': u'18-23'})
 
-TASK [vlan : set spanning-tree] ************************************************
+TASK [vlan : set spanning-tree] *******************************************
 ok: [switch1]
 
-TASK [saveconfig : save running-config to startup-config] **********************
+TASK [saveconfig : save running-config to startup-config] *****************
 ok: [switch1]
 
-PLAY RECAP *********************************************************************
-switch1                    : ok=9    changed=0    unreachable=0    failed=0
-\end{verbatim}
+PLAY RECAP ****************************************************************
+switch1               : ok=9    changed=0    unreachable=0    failed=0
+
+\end{BVerbatim}
+\end{center}
 
 Na het uitvoeren van de Ansible rol bleek dan ook dat de configuratie identiek gelijk was aan elkaar. 
 
