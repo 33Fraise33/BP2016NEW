@@ -5,20 +5,19 @@
 \chapter{Configuratie zonder automatisatie}
 \label{ch:configuratie}
 
-Voor de testen zal er gebruik gemaakt worden van een Cisco IOS switch geproduceerd in 2006. Deze is een 2960 Series switch en meer bepaald de C2960-24LT. Deze heeft 8 poorten met POE en 2 Gigabit interfaces. De versie die op de switch geïnstalleerd staat is 'Version 12.2(44r)SE1'.
-
-Bij de configuratie van de switch zijn er drie grote lijnen die we kunnen zien: eerst en vooral het instellen van de basisinstellingen. Dit bestaat uit het configureren van een wachtwoord, hostname en het instellen van standaardwaarden zoals een 'no ip domain-lookup'.
+Bij de configuratie van voorgemelde switch zijn er drie grote lijnen die we kunnen zien: eerst en vooral het instellen van de basisinstellingen. Dit bestaat uit het configureren van een wachtwoord, hostname en het instellen van standaardwaarden zoals een 'no ip domain-lookup'.
 Daarna wordt er een configuratie aangemaakt met enkele vlans. Deze krijgen een ip adres en een beschrijving. Als laatste onderdeel hebben we dan nog het instellen van een VTP (VLAN Trunk Protocol) server op het apparaat. Dit allemaal samen zou al goed moeten aantonen in hoeverre het mogelijk is om deze zaken te automatiseren.
 
 \section{Voorbeeld configuratie}
 \label{sec:voorbeeld}
-Voor de configuratie van de Switch is er het voorbeeld gevolgd van een oefening uit de CCNA cursus in combinatie met een blogpost die beschrijft hoe je SSH openzet op cisco apparatuur. De SSH connectie is nodig om vanaf Ansible scripts te kunnen laten uitvoeren. 
+Voor de configuratie van de Switch is er het voorbeeld gevolgd van een oefening uit de CCNA cursus in combinatie met een blogpost die beschrijft hoe je SSH openzet op cisco apparatuur. De SSH connectie is nodig om vanaf Ansible scripts te kunnen laten uitvoeren. \autocite{ciscoSSH}
 \\
-De opzet van een switch wordt door het benodigde onderdeel dan ook verdeeld in 2 onderdelen. Het eerste zijn de commando's om van de initiële configuratie naar de minimale configuratie te raken. Dan daarna hebben we het tweede onderdeel met commando's die nodig zijn om de complete configuratie van de apparatuur af te maken. Hierdoor hebben we als resultaat 3 verschillende configuraties in bijlage: Initial Config, Minimal Config en Complete Config. 
+
+De opzet van een switch wordt door het benodigde onderdeel dan ook verdeeld in twee onderdelen. Het eerste zijn de commando's om van de initiële configuratie naar de minimale configuratie te raken. Dan daarna hebben we het tweede onderdeel met commando's die nodig zijn om de complete configuratie van de apparatuur af te maken. Hierdoor hebben we als resultaat drie verschillende configuraties in bijlage: Initial Config, Minimal Config en Complete Config. (zie Bijlage~\ref{ch:switchconfigsannexes})
 
 \subsection{Initiële configuratie}
 \label{sec:initiële configuratie}
-De initiële configuratie is deze die beschikbaar is zonder enige configuratie op de switch. Op de huidige switch stond er al wat configuratie dus werd deze teruggezet naar 'Factory Defaults'. Hiervoor zijn twee commando's nodig. Het ene commando verwijdert de huidige configuratie en de tweede verwijdert de vlan configuratie (indien deze aanwezig is) die op het moment aanwezig is op de switch. \autocite{resetSwitch}
+De initiële configuratie is deze die beschikbaar is zonder enige configuratie op de switch. Op de huidige switch stond er al wat configuratie na wat prutsen om de commando's terug op te frissen, dus werd deze teruggezet naar 'Factory Defaults'. Hiervoor zijn twee commando's nodig. Het ene commando verwijdert de huidige configuratie en de tweede verwijdert de vlan configuratie (indien deze aanwezig is) die op het moment aanwezig is op de switch. \autocite{resetSwitch}
 \\
 
 \begin{center}
@@ -41,8 +40,8 @@ Na het uitvoeren van de commando's wordt nog even gevraagd om de reload van de s
 
 \subsection{Minimale configuratie}
 \label{sec:minimale configuratie}
-Omdat het nodig is om vanaf de switch op afstand te kunnen aanspreken is er nood aan ssh in combinatie met een management ip adres. Omdat we verder werken op de CCNA oefening is er gekozen om een ip adres met ip '172.17.1.2' in te stellen op vlan1. Verder wordt het crypto commando gebruikt om een RSA key aan te maken met een sterkte van 2048 bits omdat dit tegenwoordig grotendeels de standaard is en er zelf al vaak geopteerd wordt om keys van 4096 bits te nemen.
-Verder is het ook nodig om een gebruikersnaam en wachtwoord in te stellen om gebruik te kunnen maken van remote ssh logins. Dan pas zal het mogelijk zijn om een connectie te maken over ssh. Als laatste wordt hier ook nog de 'password-encryption' service geactiveerd om de beveiliging te optimaliseren en de wachtwoorden niet in clear text in de configuratie te laten staan.
+Omdat het nodig is om vanaf de switch op afstand te kunnen aanspreken is er nood aan SSH in combinatie met een management ip adres. Omdat we verder werken op de CCNA oefening is er gekozen om een ip adres met ip '172.17.1.2' in te stellen op vlan1. Verder wordt het crypto commando gebruikt om een RSA key aan te maken met een sterkte van 2048 bits omdat dit tegenwoordig grotendeels de standaard is en er zelf al vaak geopteerd wordt om keys van 4096 bits te nemen.
+Verder is het ook nodig om een gebruikersnaam en wachtwoord in te stellen om gebruik te kunnen maken van remote SSH logins. Dan pas zal het mogelijk zijn om een connectie te maken over SSH. Als laatste wordt hier ook nog de 'password-encryption' service geactiveerd om de beveiliging te optimaliseren en de wachtwoorden niet in clear text in de configuratie te laten staan.
 
 \begin{center}
 \begin{verbatim}
@@ -87,13 +86,14 @@ Proceed with reload? [confirm]
 \end{verbatim}
 \end{center}
 
-Na dat we deze configuratie hebben ingeladen is het mogelijk om via ssh connectie te maken met de switch en vanaf daaruit de configuratie af te werken. In ons voorbeeld weten we dat we poort 1-23 zullen veranderen van configuratie dus daarom connecteer je voor ssh best via ssh omdat er anders disconnects kunnen voorkomen tijdens het wijzigen van de configuratie op de switch. Als we poort 24 op het management vlan houden is er geen probleem. Daarom dat we ook hier al een ip adres instellen voor de default gateway en vlan1.
+Na dat we deze configuratie hebben ingeladen is het mogelijk om via ssh connectie te maken met de switch en vanaf daaruit de configuratie af te werken. In ons voorbeeld weten we dat we poort 1-23 zullen veranderen van configuratie dus daarom connecteer je voor ssh best via poort 24 die op vlan1 zit, dit omdat er anders disconnects kunnen voorkomen tijdens het wijzigen van de configuratie op de switch. Als we poort 24 op het management vlan houden is er geen probleem. Daarom dat we ook hier al een ip adres instellen voor de default gateway en vlan1.
 
 \subsection{Complete configuratie}
 \label{sec:complete configuratie}
-Als laatste hebben we dan nog de volledige configuratie. Dit zijn de commando's die uitgevoerd moeten worden om de volledige correcte configuratie te verkrijgen. Het is de bedoeling dat ieder automatisatie methode dezelfde  De onderstaande commando's moeten uitgevoerd worden om alles werkende te hebben zoals het hoort. De uiteindelijke volledige configuratie zijn onderaan beschikbaar in de bijlagen. 
+Als laatste hebben we dan nog de volledige configuratie. Dit zijn de commando's die uitgevoerd moeten worden om de volledige correcte configuratie te verkrijgen. Het is de bedoeling dat ieder automatisatie methode hetzelfde eindresultaat behaalt, gelijk aan wat door deze commando's bereikt wordt. De onderstaande commando's moeten uitgevoerd worden om alles werkende te hebben zoals het hoort. De uiteindelijke volledige configuratie is onderaan beschikbaar in de bijlage~\ref{ch:switchconfigsannexes}.
+ 
 \begin{center}
-\begin{verbatim}
+\begin{Verbatim}
 Username: switchadmin
 Password: 
 Switch>en
@@ -149,13 +149,10 @@ Building configuration...
 [OK]
 switch1#reload
 Proceed with reload? [confirm]
-\end{verbatim}
+\end{Verbatim}
 \end{center}
 
-Na het uitvoeren van bovenstaande commando's zijn er enkele vlans ingesteld op de switch en heeft deze de vtp server functionaliteit gekregen.
-
-Bijlage: cisco excercise example.pdf\\
-Bijlage: -does not exist yet- final configuration
+Na het uitvoeren van bovenstaande commando's zijn er enkele vlans ingesteld op de switch en heeft deze de vtp server functionaliteit gekregen. Ook wordt er een spanning-tree prioriteit ingesteld.
 
 
 \section{'Automatisatie' of vereenvoudiging via ingebouwde mogelijkheden}
@@ -164,18 +161,19 @@ Voor de configuratie van een Cisco apparaat kan vaak wel nog een basis methode g
 
 \subsection{Commando's in terminal venster kopiëren}
 \label{sec:commandocopy}
-Deze methode is vrij eenvoudig en is bij voorgaande voorbeelden al gebruikt geweest omdat het gelijk staat aan het letterlijk uitvoeren van bepaalde commando's. Ieder commando die je normaal zou uitvoeren staat in de configuratie in de correcte volgorde. Let op hierbij moet je ook rekening houden dat je een enter of dergelijke ook tussen je lijnen moet plaatsen om bepaalde zaken te confirmen. 
+Deze methode is vrij eenvoudig en is bij voorgaande voorbeelden al gebruikt geweest omdat het gelijk staat aan het letterlijk uitvoeren van bepaalde commando's. Ieder commando die je normaal zou uitvoeren staat in de configuratie in de correcte volgorde. Let op, hierbij moet je ook rekening houden dat je een enter of dergelijke ook tussen je lijnen moet plaatsen om bepaalde zaken te bevestigen. Als je een reload commando wil bevestigen moet je dus een lege lijn na het commando plaatsen. 
 \\
 Een voorbeeld hiervan vind je onderaan in de bijlagen. Dit is het template die hier gebruikt is geweest om de basis configuratie op te zetten waarmee Ansible zal vergeleken worden. Voor een apparaat is dit nog vrij haalbaar maar als je meerdere apparaten hebt in een netwerk waarbij je een voor een moet connecteren om dan een configuratie te plakken die elke keer een klein beetje anders is. Dan is het nog hopen dat je een bepaald item niet vergeet te veranderen of fout verandert. Hier is dus heel veel plaats voor 'human error'. Voor de gebruikte configuratie op punt stond is de switch toch wel een paar keer gewist geweest om terug van vooraf te beginnen.
 
 \subsection{Volledige running-config in terminal venster kopiëren}
 \label{sec:configcopy}
-De tweede mogelijkheid is het volledig kopiëren van een configuratie in de terminal. Wanneer men het commando 'show running-config' uitvoert dan krijg je de volledige huidige configuratie terug. Deze is zo opgezet dat deze in de configuratie modus kan geplakt worden in de terminal. Hiervoor moet je dus wel in de configuratie modus zitten. 
+De tweede mogelijkheid is het volledig kopiëren van een configuratie in de terminal. Wanneer men het commando 'show running-config' uitvoert dan krijg je de volledige huidige configuratie terug. Deze is zo opgezet dat deze in de configuratie modus kan geplakt worden in de terminal. Hiervoor moet je dus wel in de configuratie modus zitten die je bereikt met het commando 'configure terminal' of in het kort 'conf t'. 
 \\
-Ook deze methode lijkt helemaal niet feilloos en bij het uitgevoerde onderzoek werkt dit in de praktijk nog minder dan bovengenoemde methode. Bij het plakken van de complete configuatie in de configuratie modus loopt het voorbij de helft mis. De commando's lopen door elkaar lijkt het dit kan je hieronder zien. Ook staat niet de volledige vlan configuratie in de running-config. Deze wordt wel aangemaakt maar bijvoorbeeld de benaming mist wel wat het voor toekomstige foutopsporing iets moeilijker zou kunnen maken.
+
+Ook deze methode lijkt helemaal niet feilloos en bij het uitgevoerde onderzoek werkt dit in de praktijk nog minder dan bovengenoemde methode. Bij het plakken van de complete configuratie in de configuratie modus loopt het voorbij de helft mis. Het lijkt alsof de commando's door elkaar beginnen te lopen. Ook staat niet de volledige vlan configuratie in de running-config. Deze wordt wel aangemaakt maar bijvoorbeeld de benaming mist wel wat het voor toekomstige foutopsporing iets moeilijker zou kunnen maken.
 
 \begin{center}
-\begin{verbatim}
+\begin{Verbatim}
 ...
 switch1(config-if)#interface FastEthernet0/11
 switch1(config-if)#switchport access vlan 10
@@ -198,7 +196,7 @@ switch1(config-if)#interface FastEthernet0/21
 switch1(config-if)#switchport access vlan 20
 switch1(config-if)#!
 ...
-\end{verbatim}
+\end{Verbatim}
 \end{center}
 
-Het lijkt er op dat het automatisch aanmaken van de vlans voor problemen zorgt bij het verder configureren. Bij de eerste 'invalid input detected' merken we dat het commando een samenvoeging is van 'vlan 20' en 'switchport access vlan 20'. Dus voor productie lijkt dit dan toch misschien zelf nog iets minder geschikt dan eerste methode. Het voordeel aan deze wel is dat je de volledige configuratie zou meenemen. Als je een switch hebt die al gedeeltelijk geconfigureerd zou zijn dan is dit een veiligere methode kunnen zijn.
+Het lijkt er op dat het automatisch aanmaken van de vlans voor problemen zorgt bij het verder configureren. Bij de eerste 'invalid input detected' merken we dat het commando een samenvoeging is van 'vlan 10' en 'switchport access vlan 20'. Dus voor productie lijkt dit dan toch misschien zelf nog iets minder geschikt dan eerste methode. Het voordeel aan deze wel is dat je de volledige configuratie zou meenemen. Als je een switch hebt die al gedeeltelijk geconfigureerd zou zijn dan kan dit een veiligere methode zijn.

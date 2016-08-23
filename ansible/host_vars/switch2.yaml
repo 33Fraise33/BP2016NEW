@@ -1,4 +1,4 @@
-# host_vars/switch1.yaml
+# host_vars/switch2.yaml
 
 management_ip: 172.17.1.3
 

@@ -13,4 +13,772 @@
 \section{Ansible Playbook}
 \label{ch:ansibleplaybookannex}
 
-TESTTEST
+\begin{BVerbatim}
+.
+|-- group_vars
+|   `-- switches.yaml
+|-- host_vars
+|   |-- switch1.yaml
+|   `-- switch2.yaml
+|-- roles
+|   |-- common-command
+|   |   `-- tasks
+|   |       `-- main.yaml
+|   |-- common-config
+|   |   `-- tasks
+|   |       `-- main.yaml
+|   |-- saveconfig
+|   |   `-- tasks
+|   |       `-- main.yaml
+|   |-- trunking
+|   |   `-- tasks
+|   |       `-- main.yaml
+|   |-- vlan
+|   |   `-- tasks
+|   |       `-- main.yaml
+|   `-- vtp
+|       `-- tasks
+|           `-- main.yaml
+|-- inventory
+`-- ios.yaml
+\end{BVerbatim}
+
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{group\_vars/switches.yaml}]
+cli:
+  host: "{{ management_ip }}"
+  username: "switchadmin"
+  password: "cisco"
+  authorize: yes
+  auth_pass: "class"
+  transport: cli
+\end{Verbatim}
+
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{host\_vars/switch1.yaml}]
+management_ip: 172.17.1.2
+
+vlan99_ip: "172.17.99.11 255.255.255.0"
+
+vlans:
+  99:
+    name: management
+  10:
+    name: faculty-staff
+  20:
+    name: students
+  30:
+    name: guest
+
+interfaces:
+  6-10:
+    vlan: 30
+  11-17:
+    vlan: 10
+  18-23:
+    vlan: 20
+
+vtp: server
+\end{Verbatim}
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{host\_vars/switch2.yaml}]
+management_ip: 172.17.1.3
+
+vlan99_ip: "172.17.99.12 255.255.255.0"
+
+vtp: client
+\end{Verbatim}
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{roles/common-command/tasks/main.yaml}]
+- name: set hostname
+  ios_command:
+    commands:
+      - conf t
+      - hostname "{{ inventory_hostname }}"
+    provider: "{{ cli }}"
+
+
+- name: disable service 'config'
+  ios_command:
+    commands:
+      - conf t
+      - no service config
+    provider: "{{ cli }}"
+\end{Verbatim}
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{roles/common-config/tasks/main.yaml}]
+- name: set hostname
+  ios_config:
+    lines:
+      - ['hostname {{inventory_hostname}}']
+    provider: "{{ cli }}"
+
+- name: disable service 'config'
+  ios_config:
+    lines:
+      - ['no service config']
+    provider: "{{ cli }}"
+\end{Verbatim}
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{roles/saveconfig/tasks/main.yaml}]    
+- name: save running-config to startup-config
+  ios_command:
+    commands:
+      - write memory
+    provider: "{{ cli }}"
+\end{Verbatim}
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{roles/trunking/tasks/main.yaml}]       
+- name: set interfaces 1-5 as trunk ports
+  ios_command:
+    commands:
+      - conf t
+      - int range fa0/1-5
+      - switchport mode trunk
+      - switchport trunk native vlan 99
+      - no shutdown
+    provider: "{{ cli }}"
+
+- name: set ip trunk vlan
+  ios_command:
+    commands:
+      - conf t
+      - int vlan99
+      - ip address {{ vlan99_ip }}
+    provider: "{{ cli }}"
+\end{Verbatim}
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{roles/vlan/tasks/main.yaml}]
+- name: set vlans
+  ios_command:
+    commands:
+      - conf t
+      - vlan {{ item.key }}
+      - name {{ item.value.name }}
+    provider: "{{ cli }}"
+  with_dict: "{{ vlans }}"
+
+- name: assign interfaces to vlans
+  ios_command:
+    commands:
+      - conf t
+      - int range fa0/{{ item.key }}
+      - switchport access vlan {{ item.value.vlan }}
+    provider: "{{ cli }}"
+  with_dict: "{{ interfaces }}"
+
+- name: set spanning-tree
+  ios_command:
+    commands:
+      - conf t
+      - spanning-tree vlan 99 priority 4096
+    provider: "{{ cli }}"
+\end{Verbatim}
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{roles/vtp/tasks/main.yaml}]
+- name: set vlans
+  ios_command:
+    commands:
+      - conf t
+      - vtp mode {{ vtp }}
+      - vtp domain Lab5
+      - vtp password cisco
+    provider: "{{ cli }}"
+
+\end{Verbatim}
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{./inventory}]
+[routers]
+router1
+
+[server-switches]
+switch1
+
+[client-switches]
+switch2
+
+[switches:children]
+server-switches
+client-switches
+\end{Verbatim}
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{group\_vars/switches.yaml}]
+- hosts: server-switches
+  gather_facts: no
+  connection: local
+
+  vars:
+    limit_to: "*"
+
+  roles:
+    - common-command
+#   - common-config
+    - vtp
+    - trunking
+    - vlan
+    - saveconfig
+
+#- hosts: client-switches
+#  gather_facts: no
+#  connection: local
+#
+#  vars:
+#    limit_to: "*"
+#
+#  roles:
+#    - common-command
+##  - common-config
+#    - vtp
+#    - trunking
+#    - saveconfig
+
+\end{Verbatim}
+
+\section{Switch Configuration Files }
+\label{ch:switchconfigsannexes}
+
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{Switch Commands}]
+
+# all switches (except for a unique ip address)
+
+en
+conf t
+ip default-gateway 172.17.1.1
+int vlan1
+ip address 172.17.1.2 255.255.255.0
+no shut
+exit
+hostname switchname
+ip domain-name website.be
+crypto key generate rsa
+2048
+username switchadmin password cisco
+enable secret class
+no ip domain-lookup
+line console 0
+logging synchronous
+login local
+line vty 0 4
+transport input ssh
+login local
+password cisco
+exit
+service password-encryption
+end
+write memory
+reload
+
+.
+
+# Switch 1
+en
+class
+conf t
+vtp mode server
+vtp domain Lab5
+vtp password cisco
+int range fa0/1-5
+switchport mode trunk
+switchport trunk native vlan 99
+no shutdown
+exit
+vlan 99
+name management
+vlan 10
+name faculty-staff
+vlan 20
+name students
+vlan 30
+name guest
+exit
+int vlan99
+ip address 172.17.99.11 255.255.255.0
+exit
+int range fa0/6-10
+switchport access vlan 30
+int range fa0/11-17
+switchport access vlan 10
+int range fa0/18-23
+switchport access vlan 20
+exit
+spanning-tree vlan 99 priority 4096
+end
+write memory
+reload
+
+.
+
+# Optional Switch 2
+
+vtp mode client
+vtp domain Lab5
+vtp password cisco
+end
+int range fa0/1-5
+switchport mode trunk
+switchport trunk native vlan 99
+no shut
+int vlan99
+ip address 172.17.99.12 255.255.255.0
+end
+write memory
+
+\end{Verbatim}
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{Initial Switchconfig}]
+
+Current configuration : 1274 bytes
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname Switch
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+system mtu routing 1500
+ip subnet-zero
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+!
+!
+interface FastEthernet0/1
+!
+interface FastEthernet0/2
+!
+interface FastEthernet0/3
+!
+interface FastEthernet0/4
+!
+interface FastEthernet0/5
+!
+interface FastEthernet0/6
+!
+interface FastEthernet0/7
+!
+interface FastEthernet0/8
+!
+interface FastEthernet0/9
+!
+interface FastEthernet0/10
+!
+interface FastEthernet0/11
+!
+interface FastEthernet0/12
+!
+interface FastEthernet0/13
+!
+interface FastEthernet0/14
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+!
+interface FastEthernet0/23
+!
+interface FastEthernet0/24
+!
+interface GigabitEthernet0/1
+!
+interface GigabitEthernet0/2
+!
+interface Vlan1
+ no ip address
+ no ip route-cache
+ shutdown
+!
+ip http server
+ip http secure-server
+!
+control-plane
+!
+!
+line con 0
+line vty 5 15
+!
+end
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/1, Fa0/2, Fa0/3, Fa0/4
+                                                Fa0/5, Fa0/6, Fa0/7, Fa0/8
+                                                Fa0/9, Fa0/10, Fa0/11, Fa0/12
+                                                Fa0/13, Fa0/14, Fa0/15, Fa0/16
+                                                Fa0/17, Fa0/18, Fa0/19, Fa0/20
+                                                Fa0/21, Fa0/22, Fa0/23, Fa0/24
+                                                Gi0/1, Gi0/2
+1002 fddi-default                     act/unsup
+1003 token-ring-default               act/unsup
+1004 fddinet-default                  act/unsup
+1005 trnet-default                    act/unsup
+\end{Verbatim}
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{Minimal Switchconfig}]
+
+Current configuration : 3226 bytes
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname Switch
+!
+boot-start-marker
+boot-end-marker
+!
+enable secret 5 $1$ad1E$eENpnWdsRwvYDTMRFlbDU1
+!
+username switchadmin password 7 070C285F4D06
+no aaa new-model
+system mtu routing 1500
+ip subnet-zero
+!
+no ip domain-lookup
+ip domain-name website.be
+!
+!
+crypto pki trustpoint TP-self-signed-3395035520
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3395035520
+ revocation-check none
+ rsakeypair TP-self-signed-3395035520
+!
+!
+crypto pki certificate chain TP-self-signed-3395035520
+ certificate self-signed 01
+  30820249 308201B2 A0030201 02020101 300D0609 2A864886 F70D0101 04050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 33333935 30333535 3230301E 170D3933 30333031 30303030
+  35385A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D33 33393530
+  33353532 3030819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100A673 DFD43E3D 3BE774FD 0CB6712E A10DE672 23FEAB25 17958BA9 ED53EF31
+  16E89D4B D12CC2BF C3F01FA9 F59BB01D C357FF77 326CA8B6 EDE96337 8F9FE592
+  A130BE8A 855DFE7F B6244C18 599619CC 332DCDAB 47820375 C3178B35 716936BA
+  66C276C6 E64E93C3 0742C86B 5392508F 479A4BEF 77D02D10 2E651B8B 890B5AAB
+  4C6F0203 010001A3 71306F30 0F060355 1D130101 FF040530 030101FF 301C0603
+  551D1104 15301382 11537769 7463682E 77656273 6974652E 6265301F 0603551D
+  23041830 16801477 D48AFA9A FABC2C8F ADA95327 05318386 80905C30 1D060355
+  1D0E0416 041477D4 8AFA9AFA BC2C8FAD A9532705 31838680 905C300D 06092A86
+  4886F70D 01010405 00038181 004087FF 7549472F 7A4F0F86 5679CCF6 E7181F92
+  3ADD4015 4E9FA2E7 B01FDF33 A21201B7 9EFBBA7A 84517C3D 8344650C 5059EB07
+  C3A063FD 24A56FDC BEC1ADA8 0FD8C3DE 1F06EBB2 2F102D9E 16191DFB D56291D2
+  072E7607 FF83C621 1281B7D0 68B8F6DC ED15CE01 7ED31165 ACE71D37 AA5E2538
+  476F348E 65D8C7CE EF0F32A6 F3
+  quit
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+!
+!
+interface FastEthernet0/1
+!
+interface FastEthernet0/2
+!
+interface FastEthernet0/3
+!
+interface FastEthernet0/4
+!
+interface FastEthernet0/5
+!
+interface FastEthernet0/6
+!
+interface FastEthernet0/7
+!
+interface FastEthernet0/8
+!
+interface FastEthernet0/9
+!
+interface FastEthernet0/10
+!
+interface FastEthernet0/11
+!
+interface FastEthernet0/12
+!
+interface FastEthernet0/13
+!
+interface FastEthernet0/14
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+!
+interface FastEthernet0/23
+!
+interface FastEthernet0/24
+!
+interface GigabitEthernet0/1
+!
+interface GigabitEthernet0/2
+!
+interface Vlan1
+ ip address 172.17.1.2 255.255.255.0
+ no ip route-cache
+!
+ip default-gateway 172.17.1.1
+ip http server
+ip http secure-server
+!
+control-plane
+!
+!
+line con 0
+ logging synchronous
+ login local
+line vty 0 4
+ password 7 14141B180F0B
+ login local
+ transport input ssh
+line vty 5 15
+ login
+ !
+end
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/1, Fa0/2, Fa0/3, Fa0/4
+                                                Fa0/5, Fa0/6, Fa0/7, Fa0/8
+                                                Fa0/9, Fa0/10, Fa0/11, Fa0/12
+                                                Fa0/13, Fa0/14, Fa0/15, Fa0/16
+                                                Fa0/17, Fa0/18, Fa0/19, Fa0/20
+                                                Fa0/21, Fa0/22, Fa0/23, Fa0/24
+                                                Gi0/1, Gi0/2
+1002 fddi-default                     act/unsup
+1003 token-ring-default               act/unsup
+1004 fddinet-default                  act/unsup
+1005 trnet-default                    act/unsup 
+
+\end{Verbatim}
+\begin{Verbatim}[frame=topline, framesep=4mm, label=\fbox{Complete Switchconfig}]
+
+Current configuration : 4110 bytes
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname switch1
+!
+boot-start-marker
+boot-end-marker
+!
+enable secret 5 $1$ad1E$eENpnWdsRwvYDTMRFlbDU1
+!
+username switchadmin password 7 070C285F4D06
+no aaa new-model
+system mtu routing 1500
+ip subnet-zero
+!
+no ip domain-lookup
+ip domain-name website.be
+!
+!
+crypto pki trustpoint TP-self-signed-3395035520
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3395035520
+ revocation-check none
+ rsakeypair TP-self-signed-3395035520
+!
+!
+crypto pki certificate chain TP-self-signed-3395035520
+ certificate self-signed 01
+  3082024A 308201B3 A0030201 02020101 300D0609 2A864886 F70D0101 04050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 33333935 30333535 3230301E 170D3933 30333031 30303030
+  35355A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D33 33393530
+  33353532 3030819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100A673 DFD43E3D 3BE774FD 0CB6712E A10DE672 23FEAB25 17958BA9 ED53EF31
+  16E89D4B D12CC2BF C3F01FA9 F59BB01D C357FF77 326CA8B6 EDE96337 8F9FE592
+  A130BE8A 855DFE7F B6244C18 599619CC 332DCDAB 47820375 C3178B35 716936BA
+  66C276C6 E64E93C3 0742C86B 5392508F 479A4BEF 77D02D10 2E651B8B 890B5AAB
+  4C6F0203 010001A3 72307030 0F060355 1D130101 FF040530 030101FF 301D0603
+  551D1104 16301482 12737769 74636831 2E776562 73697465 2E626530 1F060355
+  1D230418 30168014 77D48AFA 9AFABC2C 8FADA953 27053183 8680905C 301D0603
+  551D0E04 16041477 D48AFA9A FABC2C8F ADA95327 05318386 80905C30 0D06092A
+  864886F7 0D010104 05000381 81006AA2 B75C7693 7562D9CC DC1F2EA7 1C686C77
+  F8536E96 FB7EF881 F8CEB1C7 1E2BDFDD 4248806D 87424281 24B4940C 8FF74A21
+  059C9F53 AF3C49C8 C2DF7262 FC20015C 31AA9A8A B9B850CA 40700B80 323E1CCE
+  D1397329 14FB561C AD0445DC DD666155 4AEC3C75 6B48B2E6 85ACA015 C40D6F26
+  7455E576 FDC95466 CFAD97D9 F5C2
+  quit
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+spanning-tree vlan 99 priority 4096
+!
+vlan internal allocation policy ascending
+!
+!
+!
+interface FastEthernet0/1
+ switchport trunk native vlan 99
+ switchport mode trunk
+!
+interface FastEthernet0/2
+ switchport trunk native vlan 99
+ switchport mode trunk
+!
+interface FastEthernet0/3
+ switchport trunk native vlan 99
+ switchport mode trunk
+!
+interface FastEthernet0/4
+ switchport trunk native vlan 99
+ switchport mode trunk
+!
+interface FastEthernet0/5
+ switchport trunk native vlan 99
+ switchport mode trunk
+!
+interface FastEthernet0/6
+switchport access vlan 30
+!
+interface FastEthernet0/7
+switchport access vlan 30
+!
+interface FastEthernet0/8
+switchport access vlan 30
+!
+interface FastEthernet0/9
+switchport access vlan 30
+!
+interface FastEthernet0/10
+switchport access vlan 30
+!
+interface FastEthernet0/11
+switchport access vlan 10
+!
+interface FastEthernet0/12
+switchport access vlan 10
+!
+interface FastEthernet0/13
+switchport access vlan 10
+!
+interface FastEthernet0/14
+switchport access vlan 10
+!
+interface FastEthernet0/15
+switchport access vlan 10
+!
+interface FastEthernet0/16
+switchport access vlan 10
+!
+interface FastEthernet0/17
+switchport access vlan 10
+!
+interface FastEthernet0/18
+switchport access vlan 20
+!
+interface FastEthernet0/19
+switchport access vlan 20
+!
+interface FastEthernet0/20
+switchport access vlan 20
+!
+interface FastEthernet0/21
+switchport access vlan 20
+!
+interface FastEthernet0/22
+switchport access vlan 20
+!
+interface FastEthernet0/23
+switchport access vlan 20
+!
+interface FastEthernet0/24
+!
+interface GigabitEthernet0/1
+!
+interface GigabitEthernet0/2
+!
+interface Vlan1
+ ip address 172.17.1.2 255.255.255.0
+ no ip route-cache
+!
+interface Vlan99
+ ip address 172.17.99.11 255.255.255.0
+ no ip route-cache
+!
+ip default-gateway 172.17.1.1
+ip http server
+ip http secure-server
+!
+control-plane
+!
+!
+line con 0
+ logging synchronous
+ login local
+line vty 0 4
+ password 7 14141B180F0B
+ login local
+ transport input ssh
+line vty 5 15
+ login
+!
+end
+
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/1, Fa0/2, Fa0/3, Fa0/4
+                                                Fa0/5, Fa0/24, Gi0/1, Gi0/2
+10   faculty-staff                    active    Fa0/11, Fa0/12, Fa0/13, Fa0/14
+                                                Fa0/15, Fa0/16, Fa0/17
+20   students                         active    Fa0/18, Fa0/19, Fa0/20, Fa0/21
+                                                Fa0/22, Fa0/23
+30   guest                            active    Fa0/6, Fa0/7, Fa0/8, Fa0/9
+                                                Fa0/10
+99   management                       active
+1002 fddi-default                     act/unsup
+1003 token-ring-default               act/unsup
+1004 fddinet-default                  act/unsup
+1005 trnet-default                    act/unsup
+
+\end{Verbatim}
+

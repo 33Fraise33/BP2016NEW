@@ -4,13 +4,13 @@
 
 \chapter{Automatisatie in combinatie met NAPALM}
 \label{ch:napalm}
-Naast Ansible hebben we nog een tweede optie die een heel stuk minder bekend is dan de eerstgenoemde. Dit is NAPALM of ook wel 'Network Automation and Programmability Abstraction Layer with Multivendor support'. Kortgezegd is dit een project geschreven in python om netwerkapparatuur te kunnen aanspreken. Het verschil met ansible zit hem hier in het feit dat je geen tasks gaat definiëren maar dat je een bepaalde configuratie opstelt voor je apparaat en deze daarna test tegenover de huidige configuratie. Voor dat deze naar het apparaat doorgestuurd wordt krijg je een overzicht vergelijkbaar met dat van een git commit waar de wijzigingen zitten in de configuratie. Indien je akkoord bent met de wijzigingen kun je deze 'committen' naar het apparaat of afwijzen om de configuratie te herwerken. 
+Naast Ansible hebben we nog een tweede optie die een heel stuk minder bekend is dan de eerstgenoemde. Dit is NAPALM of ook wel 'Network Automation and Programmability Abstraction Layer with Multivendor support'. Kortgezegd is dit een project geschreven in python om netwerkapparatuur te kunnen aanspreken. Het verschil met ansible zit hem hier in het feit dat je geen tasks gaat definiëren maar dat je een bepaalde configuratie opstelt voor je apparaat en deze daarna test tegenover de huidige configuratie. Voor dat deze permanent naar het apparaat doorgestuurd wordt krijg je een overzicht vergelijkbaar met dat van een git commit waar de wijzigingen zitten in de configuratie. Indien je akkoord bent met de wijzigingen kun je deze 'committen' naar het apparaat of afwijzen om de configuratie te herwerken. 
 \\
 
 Een voorbeeld van hoe de wijzigingen worden weergegeven kan je hier onder zien.
 
 \begin{center}
-\begin{BVerbatim}
+\begin{Verbatim}
 + hostname pyeos-unittest-changed
 - hostname pyeos-unittest
 router bgp 65000
@@ -27,40 +27,39 @@ router bgp 65000
 interface Ethernet2
 + description ble
 - description bla
-\end{BVerbatim}
+\end{Verbatim}
 \end{center}
 
-Hoewel dit enkele mogelijkheden biedt die een terminal niet heeft, mist het in vergelijking met Ansible wel nog andere punten die ook een meerwaarde zouden bieden. Een van de grootste voordelen blijft wel het op voorhand zien van de wijzigingen die zullen gebeuren aan je apparaat. Hierdoor is iets over het hoofd zien iets dat minder vaak zal voorkomen. Moest er dan toch nog een foutje in geslopen zijn kan je nog je wijzigingen ongedaan maken met de rollback functionaliteit.
+Hoewel dit enkele mogelijkheden biedt die een terminal niet heeft, mist het in vergelijking met Ansible wel nog andere punten die daar wel een meerwaarde bieden. Een van de grootste maar ook enigste voordelen blijft wel het op voorhand zien van de wijzigingen die zullen gebeuren aan je apparaat. Hierdoor is iets over het hoofd zien iets dat minder vaak zal voorkomen. Moest er dan toch nog een foutje in geslopen zijn kan je nog je wijzigingen ongedaan maken met de rollback functionaliteit. 
 
 \section{Installatie NAPALM}
 \label{ch:napalminstallation}
-De installatie van NAPALM is vrij eenvoudig in het eerste opzicht. Als eerste voorwaarde wordt er verwacht van het hostsysteem om Python geïnstalleerd te hebben. 
+De installatie van NAPALM is vrij eenvoudig in het eerste opzicht. Als eerste voorwaarde wordt er verwacht van het hostsysteem dat Python geïnstalleerd is. 
 
-Eerst en vooral wordt er een virtualenv ingesteld om alles in te runnen, dit zorgt ervoor dat alle dependencies correct zijn specifiek voor deze package en dat de permissies correct zijn. http://docs.python-guide.org/en/latest/dev/virtualenvs/
+Na dat deze voorwaarde voldoet wordt er eerst en vooral een virtualenv ingesteld om alles in te runnen, dit zorgt ervoor dat alle dependencies correct zijn specifiek voor deze package en dat de permissies correct zijn. \autocite{virtualEnvs}
 
 \begin{center}
-\begin{BVerbatim}
+\begin{Verbatim}
 $ sudo pip install virtualenv
 $ virtualenv venv
 $ source venv/bin/activate
-\end{BVerbatim}
+\end{Verbatim}
 \end{center}
 
 Daarna wordt NAPALM geïnstalleerd binnen deze virtuele environment via het pip commando.
 \begin{center}
-\begin{BVerbatim}
+\begin{Verbatim}
 (venv)$ pip install napalm
-\end{BVerbatim}
+\end{Verbatim}
 \end{center}
 
 \section{Configuratie NAPALM}
 \label{ch:napalmconfiguration}
 
-Eenmaal de installatie correct doorlopen is kunnen we aan de slag met de bibliotheek. Hiervoor werden de eerste stappen gevolgd die beschreven staan in de documentatie van NAPALM. Dit beschrijft het uitvoeren van de commando's via de Python shell. Het is natuurlijk ook mogelijk om dit in een python script om te zetten om dit te vereenvoudigen. 
-%https://napalm.readthedocs.io/en/latest/tutorials/first_steps_config.html#connecting-to-the-device
+Eenmaal de installatie correct doorlopen is kunnen we aan de slag met de bibliotheek. Hiervoor werden de eerste stappen gevolgd die beschreven staan in de documentatie van NAPALM. Dit beschrijft het uitvoeren van de commando's via de Python shell. Het is natuurlijk ook mogelijk om dit in een python script om te zetten om dit te vereenvoudigen. Dit zou dan ook mogelijkheid kunnen bieden tot het toevoegen van enkele commandline variabelen. Hierdoor zou je een configuratie al eenvoudiger naar een bepaald apparaat kunnen sturen maar de configuraties zelf zullen toch nog altijd op voorhand gemaakt moeten worden tot in de details. \autocite{napalmFirstSteps}
 
 \begin{center}
-\begin{BVerbatim}
+\begin{Verbatim}
 (venv)$ python
 >>> from napalm import get_network_driver
 >>> driver = get_network_driver('ios')
@@ -69,35 +68,31 @@ Eenmaal de installatie correct doorlopen is kunnen we aan de slag met de bibliot
 ValueError: An error occurred in dynamically determining
     remote file system: dir Translating "dir"
 % Unknown command or computer name, or unable to find computer address
-\end{BVerbatim}
+\end{Verbatim}
 \end{center}
 
 Dit is echter waar het misloopt. Bij het proberen connecteren met een Cisco IOS apparaat krijg je de bovenstaande error.
-Hoewel je zou denken dat het ip adres dan fout zou zijn geeft dit een andere error terug die weergegen wordt in volgende statement. Hier werd een willekeurig ip adres ingegeven om aan te tonen dat er verschil is met het bovenstaande.
+Hoewel je zou denken dat het ip adres dan fout zou zijn geeft dit een andere error terug die weergegeven wordt in volgende statement. Hier werd een willekeurig ip adres ingegeven om aan te tonen dat er verschil is met het bovenstaande.
 
 \begin{center}
-\begin{BVerbatim}
+\begin{Verbatim}
 >>> device = driver('213.213.1.1', 'randomuser', 'randompassword')
 >>> device.open()
 netmiko.ssh_exception.NetMikoTimeoutException: Connection to 
     device timed-out: cisco_ios 213.213.1.1:22
-\end{BVerbatim}
+\end{Verbatim}
 \end{center}
 
-Na wat zoeken op het internet blijkt dat dit een bug is bij de NAPALM bibliotheek. Het deze probeert het 'dir' commando uit te voeren wanneer deze connecteert met het apparaat om te kijken waar de huidige configuratie zich bevindt. Het Cisco apparaat moet daarvoor in de enable mode aanwezig zijn maar het 'enable' commando wordt niet uitgevoerd, noch wordt er ondersteuning geboden voor een enable password. In dezelfde Github issue staat wel uitgelegd hoe we hier omheen kunnen werken. We geven bij het aanmaken van het apparaat een optionele parameter mee die aangeeft waar de directory zich bevindt.
-
-%https://github.com/napalm-automation/napalm-ios/issues/14
-
-%https://napalm.readthedocs.io/en/latest/support/index.html#optional-arguments
+Na wat zoeken op het internet blijkt dat dit een bug is bij de NAPALM bibliotheek. Het probleem is dat deze probeert het 'dir' commando uit te voeren wanneer die connecteert met het apparaat om te kijken waar de huidige configuratie zich bevindt. Het Cisco apparaat moet daarvoor in de enable mode staat zijn. Maar het 'enable' commando wordt niet uitgevoerd, noch wordt er ondersteuning geboden voor een enable password. In dezelfde Github issue staat wel uitgelegd hoe we hier omheen kunnen werken.\footnote{https://github.com/napalm-automation/napalm-ios/issues/14} We geven bij het aanmaken van het apparaat een optionele parameter mee die aangeeft waar de directory zich bevindt.\autocite{napalmSupport}
 
 \begin{center}
-\begin{BVerbatim}
+\begin{Verbatim}
 >>> optional_args = {'dest_file_system': 'flash:'}
 >>> device = driver('172.17.1.2', 'switchadmin', 
     'cisco', optional_args=optional_args)
 >>> device.open()
 >>>
-\end{BVerbatim}
+\end{Verbatim}
 \end{center}
 
 Nu wordt er met het commando 'load\_replace\_candidate' een configuratie vergeleken met de huidige running config.
@@ -111,31 +106,31 @@ ValueError: Unexpected output from check_file_exists
 \end{BVerbatim}
 \end{center}
 
-Hier keek ik of het niet zou kunnen dat mijn directory structuur niet zou kloppen door en willekeurige bestandsnaam in te geven. Dit bleek een andere error te geven en dus heeft het bovenstaande daar niet mee te maken.
+Hier werd gekeken of het niet zou kunnen dat de directory structuur niet zou kloppen door en willekeurige bestandsnaam in te geven. Dit bleek een andere error te geven en dus heeft het bovenstaande daar niet mee te maken.
 
 \begin{center}
-\begin{BVerbatim}
+\begin{Verbatim}
 >>> device.load_replace_candidate
     (filename='../annexes/switch_config/unexisting_config')
 IOError: [Errno 2] No such file or directory: 
      '../annexes/switch_config/unexisting_config'
-\end{BVerbatim}
+\end{Verbatim}
 \end{center}
 
 Dit heeft wederom te maken met de enable functionaliteit die niet aanwezig in in de package. Dit betekend dat momenteel deze bibliotheek niet gebruikt kan worden in combinatie met Cisco IOS apparatuur en het dus voor dagelijks gebruik ook afgeschreven is. Gelukkig is de development wel nog vrij actief dus kan het goed zijn dat deze binnenkort er toch nog de mogelijkheid komt om dit te gebruiken met de IOS apparaten.
 
 \section{NAPALM Ansible Module}
 \label{ch:napalmansible}
-Naast de gewone python implementatie heeft NAPALM ook een Ansible module die je kan gebruiken in je project. Deze moet je dan toevoegen in je library folder waarna je van de module gebruik kan maken. Hiervoor moet de NAPALM python module wel voor geïnstalleerd zijn op je hostcomputer. 
+Naast de gewone python implementatie heeft NAPALM ook een Ansible module die je kan gebruiken in je project. Deze moet je dan toevoegen in je library folder waarna je van de module gebruik kan maken. Hiervoor moet de NAPALM python module wel afzonderlijk geïnstalleerd zijn op de hostcomputer. 
 \\
 
-Wat een toffe combinatie lijkt is dit combineren met de eerder besproken Ansible network modules. Zo zou je eerst het apparaat kunnen configureren met de ios\_command of ios\_config module. Eenmaal deze alles geconfigureerd heeft op het netwerkaparaat kan je nadien nogmaals de volledig gewenste configuratie met NAPALM doorsturen naar het apparaat. Zo kan je kijken of er verschillen zijn tussen wat je device nu draait en wat je zou verwachten. Voor productie lijkt dit dan ook een mooie extra omdat je nog veel duidelijker een beeld terugkrijgt als er iets niet zou kloppen.
+Wat een toffe combinatie zou kunnen zijn is dit combineren met de eerder besproken Ansible network modules. Zo zou je eerst het apparaat kunnen configureren met de ios\_command of ios\_config module. Eenmaal deze alles geconfigureerd heeft op het netwerkaparaat kan je nadien nogmaals de volledig gewenste configuratie met NAPALM doorsturen naar het apparaat. Zo kan je kijken of er verschillen zijn tussen wat je device nu draait en wat je zou verwachten. Voor productie lijkt dit dan ook een mooie extra omdat je nog veel duidelijker een beeld terugkrijgt als er iets niet zou kloppen.
 \\
 
-Een voorbeeld van het gebruik van de Ansible module zou er er als volgt kunnen uitzien. Dit uit de Github Documentatie van \cite{githubnabalmansible}. https://github.com/napalm-automation/napalm-ansible
+Een voorbeeld van het gebruik van de Ansible module zou er er als volgt kunnen uitzien. Dit uit de Github Documentatie van \textcite{napalmAnsible}.
 
 \begin{center}
-\begin{BVerbatim}
+\begin{Verbatim}
 - name: assemble configuration
   assemble:
     src=../compiled/{{ inventory_hostname }}/
@@ -151,13 +146,13 @@ Een voorbeeld van het gebruik van de Ansible module zou er er als volgt kunnen u
     commit_changes={{ commit_changes }}
     get_diffs=True
     diff_file=../compiled/{{ inventory_hostname }}/diff
-\end{BVerbatim}
+\end{Verbatim}
 \end{center}
 
 
 \section{Conclusie}
 \label{ch:napalconclusie}
-NAPALM kan een grote vooruitgang zijn op de huidige werking bij het configureren van een netwerkapparaat. Hoewel er nog vaak aan gewerkt lijkt te worden mist er toch nog de volledige ondersteuning voor Cisco IOS apparaten. Daarom is dit voor het gebruik in combinatie met die apparatuur nog niet mogelijk om dit te gebruiken.
+NAPALM kan een grote vooruitgang zijn op de huidige werking bij het configureren van een netwerkapparaat. Hoewel er nog vaak aan gewerkt lijkt te worden mist er toch nog de volledige ondersteuning voor Cisco IOS apparaten. Daarom is dit voor het gebruik in combinatie met die apparatuur nog niet mogelijk om dit correct te gebruiken.
 \\
 
 Verder kunnen we wel besluiten dat de beloofde mogelijkheden een goede manier zijn om configuratiewijzigingen overzichtelijk te kunnen weergeven. Dit maakt het wijzigen van configuraties veiliger om te doen en beter maar vooral automatisch gedocumenteerd.
